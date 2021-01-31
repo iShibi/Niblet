@@ -1,15 +1,12 @@
 import { Client, Collection } from 'discord.js';
-import type { Message } from 'discord.js';
 import fs from 'fs';
+
+// type imports
+import type { Command } from './interfaces/Command';
 
 const client: Client = new Client();
 
-const commands = new Collection();
-
-export interface Command {
-  name: string;
-  execute(message: Message, args: Array<string>): Promise<void> | void;
-}
+const commands: Collection<string, Command> = new Collection();
 
 const commandFolders: Array<string> = fs.readdirSync('./src/commands');
 commandFolders.forEach(folder => {
