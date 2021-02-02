@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "build": "npx tsc",
-    "start": "node src/index.js"
+    "start": "node --trace-warnings src/index.js"
   },
   "repository": {
     "type": "git",

@@ -1,8 +1,14 @@
-import type { Message } from 'discord.js';
+'use strict';
 
-export const command = {
+import type { Message } from 'discord.js';
+import type { Command } from '../../interfaces/Command';
+
+export const command: Command = {
   name: 'ping',
-  async execute(message: Message, args: Array<string>): Promise<void> {
+  args: false,
+  usage: '',
+  permissions: [],
+  execute(message: Message): void {
     message.channel.send('Pong!');
   },
 };
