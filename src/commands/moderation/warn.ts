@@ -2,7 +2,7 @@
 
 import type { Command } from '../../interfaces/Command';
 import type { Message } from 'discord.js';
-import { buildMention } from '../../utils/memberMentionBuilder.js';
+import { buildMention } from '../../utils/Utility.js';
 import { permissions } from '../../utils/Constants.js';
 
 export const command: Command = {
