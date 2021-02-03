@@ -1,4 +1,5 @@
 {
+  "compileOnSave": true,
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
@@ -9,5 +10,6 @@
     "alwaysStrict": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
+    "watch": true
   }
 }
