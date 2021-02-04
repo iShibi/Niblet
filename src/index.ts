@@ -1,8 +1,15 @@
 import { Client, Collection } from 'discord.js';
 import fs from 'fs';
+import mongoose from 'mongoose';
 
 // type imports
 import type { Command } from './interfaces/Command';
+
+const URI: string = process.env.NIBLET_ATLAS_URI as string;
+mongoose
+  .connect(URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(res => console.log('Connected to MongoDB Atlas'))
+  .catch(err => console.log('There was an error', err));
 
 const client: Client = new Client();
 
