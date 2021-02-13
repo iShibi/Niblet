@@ -3,10 +3,7 @@
 import type { Message, Client, Collection, GuildChannel, GuildMember, PermissionResolvable } from 'discord.js';
 import type { Command } from '../interfaces/Command';
 
-// this is just a hack, would remove this later
-import { createRequire } from 'module';
-const _require = createRequire(import.meta.url);
-const { PREFIX } = _require('../config.json');
+import { PREFIX } from '../config.js';
 
 export const event = (
   message: Message,

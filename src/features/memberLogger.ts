@@ -2,6 +2,7 @@
 
 import type { GuildMember, TextChannel } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
+import { MEMBER_LOGS_CHANNEL_ID } from '../config.js';
 
 export function log(member: GuildMember, logType: string): void {
   let description = `• Profile: ${member}
@@ -29,7 +30,7 @@ export function log(member: GuildMember, logType: string): void {
   logEmbed.setTimestamp();
 
   const memberLogChannel: TextChannel = member.guild.channels.cache.find(
-    channel => channel.name === 'member-logs',
+    channel => channel.id === MEMBER_LOGS_CHANNEL_ID,
   ) as TextChannel;
   if (memberLogChannel) {
     memberLogChannel.send(logEmbed);
