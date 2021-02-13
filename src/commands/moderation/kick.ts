@@ -6,6 +6,7 @@ import { permissions } from '../../utils/Constants.js';
 import { resolveMentionedMember } from '../../utils/Utility.js';
 import UserSchema from '../../schemas/user.js';
 import type { UserSchemaInterface } from '../../schemas/user.js';
+import { makeUserHistoryEmbed } from '../../features/userHistoryEmbed.js';
 
 export const command: Command = {
   name: 'kick',
@@ -21,7 +22,15 @@ export const command: Command = {
     const authorCanKick = message.member?.roles.highest.comparePositionTo(memberToKick.roles.highest) as number;
     if (memberToKick.kickable && (authorCanKick > 0 || message.member?.id === message.guild?.ownerID)) {
       try {
-        message.channel.send(`Are you sure you want to kick ${memberToKick.user}?`);
+        UserSchema.findOne({ id: memberToKick.id }, (err: Error, doc: UserSchemaInterface) => {
+          if (err) {
+            console.log(err);
+            return message.channel.send('An error occured!');
+          } else {
+            const historyEmbed = makeUserHistoryEmbed(doc, memberToKick.user);
+            message.channel.send(`Are you sure you want to kick ${memberToKick.user}?`, historyEmbed);
+          }
+        });
 
         const filter = (msg: Message) => msg.author.id === message.author.id;
         const confirmationMessageCollection = await message.channel.awaitMessages(filter, {
@@ -29,7 +38,9 @@ export const command: Command = {
           max: 1,
         });
 
-        if (confirmationMessageCollection.first()?.content.toLowerCase() === 'y') {
+        const reply = confirmationMessageCollection.first()?.content.toLowerCase();
+        if (!reply) return message.channel.send(`${message.author} you took too much time!`);
+        if (reply === 'y' || reply === 'yes') {
           await memberToKick.kick(reason);
           UserSchema.findOne({ id: memberToKick.id }, (err: Error, doc: UserSchemaInterface) => {
             if (err) {
@@ -48,15 +59,17 @@ export const command: Command = {
             }
           });
           return message.channel.send(`Successfully kicked ${memberToKick.user.tag}`);
+        } else if (reply === 'n' || reply === 'no') {
+          return message.channel.send('Fine, not today. Command canceled.');
         } else {
-          return message.channel.send(`${message.author}, you took too much time!`);
+          return message.channel.send('Not a valid reply, command canceled!');
         }
       } catch (error) {
         console.log(error);
         return message.channel.send('An error occured!');
       }
     } else {
-      return message.channel.send('You know you cannot do that');
+      return message.channel.send('You know you cannot do that :)');
     }
   },
 };
