@@ -26,8 +26,29 @@ export async function resolveMentionedMember(message: Message, args: Array<strin
   if (mentionedMemberID) {
     let member = message.guild?.members.resolve(mentionedMemberID);
     if (member) return member;
-    member = await message.guild?.members.fetch(mentionedMemberID);
-    if (member) return member;
+    try {
+      member = await message.guild?.members.fetch(mentionedMemberID);
+      if (member) return member;
+    } catch (err) {
+      return null;
+    }
+  }
+  return null;
+}
+
+export async function resolveMentionedUser(message: Message, args: Array<string>): Promise<User | null> {
+  const mentionedUser = message.mentions.users.first();
+  if (mentionedUser) return mentionedUser;
+  const mentionedUserID = getUserIdFromMessage(message, args);
+  if (mentionedUserID) {
+    let user = message.client.users.resolve(mentionedUserID);
+    if (user) return user;
+    try {
+      user = await message.client.users.fetch(mentionedUserID);
+      if (user) return user;
+    } catch (err) {
+      return null;
+    }
   }
   return null;
 }

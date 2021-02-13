@@ -2,11 +2,11 @@
 
 import type { UserSchemaInterface } from '../schemas/user.js';
 import { MessageEmbed } from 'discord.js';
-import type { GuildMember } from 'discord.js';
+import type { User } from 'discord.js';
 
-export function makeHistoryEmbed(data: UserSchemaInterface, member: GuildMember): MessageEmbed {
+export function makeUserHistoryEmbed(data: UserSchemaInterface, user: User): MessageEmbed {
   const historyEmbed = new MessageEmbed()
-    .setAuthor(member.user.tag, member.user.displayAvatarURL())
+    .setAuthor(`${user.tag} ${data ? '✔️' : '❌'}`, user.displayAvatarURL())
     .setColor('RED')
     .setFooter(
       // eslint-disable-next-line
