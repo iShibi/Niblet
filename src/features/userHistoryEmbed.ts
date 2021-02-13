@@ -6,7 +6,7 @@ import type { User } from 'discord.js';
 
 export function makeUserHistoryEmbed(data: UserSchemaInterface, user: User): MessageEmbed {
   const historyEmbed = new MessageEmbed()
-    .setAuthor(`${user.tag} ${data ? '✔️' : '❌'}`, user.displayAvatarURL())
+    .setAuthor(`${user.tag} (${user.id}) ${data ? '✔️' : '❌'}`, user.displayAvatarURL())
     .setColor('RED')
     .setFooter(
       // eslint-disable-next-line
