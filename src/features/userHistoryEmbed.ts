@@ -11,7 +11,7 @@ export function makeUserHistoryEmbed(data: UserSchemaInterface, user: User): Mes
     .setFooter(
       // eslint-disable-next-line
       `warnings: ${data?.warnings ?? 0}, restrictions: ${data?.restrictions ?? 0}, mutes: ${data?.mutes ?? 0}, kicks: ${data?.kicks ?? 0
-      }, bans: ${data?.bans ?? 0}`,
+      }, softbans: ${data?.softbans ?? 0}, bans: ${data?.bans ?? 0}`,
     );
 
   return historyEmbed;

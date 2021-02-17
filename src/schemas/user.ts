@@ -8,6 +8,7 @@ export interface UserSchemaInterface extends mongoose.Document {
   restrictions: number;
   mutes: number;
   kicks: number;
+  softbans: number;
   bans: number;
 }
 
@@ -19,6 +20,7 @@ const UserSchema: mongoose.Schema = new mongoose.Schema({
   restrictions: { type: Number, default: 0 },
   mutes: { type: Number, default: 0 },
   kicks: { type: Number, default: 0 },
+  softbans: { type: Number, default: 0 },
   bans: { type: Number, default: 0 },
 });
 

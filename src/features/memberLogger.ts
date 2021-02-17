@@ -5,9 +5,7 @@ import { MessageEmbed } from 'discord.js';
 import { MEMBER_LOGS_CHANNEL_ID } from '../config.js';
 
 export function log(member: GuildMember, logType: string): void {
-  let description = `• Profile: ${member}
-  • Created: \`${member.user.createdAt.toUTCString()}\`
-  • Joined: \`${member.joinedAt?.toUTCString()}\``;
+  let description = `• Profile: ${member}\n• Created: \`${member.user.createdAt.toUTCString()}\`\n• Joined: \`${member.joinedAt?.toUTCString()}\``;
 
   let embedColor: string;
   let footer: string;

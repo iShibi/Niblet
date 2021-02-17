@@ -3,30 +3,30 @@
 import type { Command } from '../../interfaces/Command';
 import type { Message } from 'discord.js';
 import { permissions } from '../../utils/Constants.js';
-import { resolveMentionedUser } from '../../utils/Utility.js';
+import { resolveMentionedMember } from '../../utils/Utility.js';
 import UserSchema from '../../schemas/user.js';
 import type { UserSchemaInterface } from '../../schemas/user.js';
 import { makeUserHistoryEmbed } from '../../features/userHistoryEmbed.js';
 
 export const command: Command = {
-  name: 'unban',
+  name: 'softban',
   args: true,
   usage: '<member> <reason>',
   permissions: [permissions.BAN_MEMBERS],
   async execute(message: Message, args: Array<string>): Promise<void | Message> {
-    const userToUnban = await resolveMentionedUser(message, args);
-    if (!userToUnban) return message.channel.send('Not a valid user.');
+    const memberToSoftban = await resolveMentionedMember(message, args);
+    if (!memberToSoftban) return message.channel.send('Not a valid user.');
 
-    const reason = `Unbanned by ${message.author.tag} | ${args.slice(1).join(' ')}`;
+    const reason = `Softbanned by ${message.author.tag} | ${args.slice(1).join(' ')}`;
 
     try {
-      UserSchema.findOne({ id: userToUnban.id }, (err: Error, doc: UserSchemaInterface) => {
+      UserSchema.findOne({ id: memberToSoftban.id }, (err: Error, doc: UserSchemaInterface) => {
         if (err) {
           console.log(err);
           return message.channel.send('An error occured!');
         } else {
-          const historyEmbed = makeUserHistoryEmbed(doc, userToUnban);
-          message.channel.send(`Are you sure you want to unban ${userToUnban}?`, historyEmbed);
+          const historyEmbed = makeUserHistoryEmbed(doc, memberToSoftban.user);
+          message.channel.send(`Are you sure you want to softban ${memberToSoftban}?`, historyEmbed);
         }
       });
 
@@ -39,8 +39,25 @@ export const command: Command = {
       const reply = confirmationMessageCollection.first()?.content.toLowerCase();
       if (!reply) return message.channel.send(`${message.author} you took too much time!`);
       if (reply === 'y' || reply === 'yes') {
-        await message.guild?.members.unban(userToUnban, reason);
-        return message.channel.send(`Successfully unbanned ${userToUnban.tag}`);
+        await memberToSoftban.ban({ reason: reason, days: 7 });
+        UserSchema.findOne({ id: memberToSoftban.id }, (err: Error, doc: UserSchemaInterface) => {
+          if (err) {
+            console.log(err);
+          } else if (doc) {
+            doc.softbans += 1;
+            doc.save();
+          } else {
+            const newUserDoc = new UserSchema({
+              username: memberToSoftban.user.username,
+              id: memberToSoftban.id,
+              tag: memberToSoftban.user.tag,
+              softbans: 1,
+            });
+            newUserDoc.save();
+          }
+        });
+        await message.guild?.members.unban(memberToSoftban);
+        return message.channel.send(`Successfully softbanned ${memberToSoftban.user.tag}`);
       } else if (reply === 'n' || reply === 'no') {
         return message.channel.send('Fine, not today. Command canceled.');
       } else {
