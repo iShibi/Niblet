@@ -16,11 +16,12 @@ export const event = (
   const commandName: string = words[0];
   const args: Array<string> = words.slice(1);
 
-  if (!commands.has(commandName)) {
+  const command: Command =
+    commands.get(commandName) || (commands.find(cmd => cmd.aliases?.includes(commandName) as boolean) as Command);
+
+  if (!command) {
     return message.channel.send('No such command exists!');
   }
-
-  const command: Command = commands.get(commandName) as Command;
 
   if (command.permissions) {
     const channel: GuildChannel = message.channel as GuildChannel;

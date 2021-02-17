@@ -5,5 +5,6 @@ export interface Command {
   args: boolean;
   usage: string;
   permissions: Array<string>;
+  aliases?: Array<string>;
   execute(message: Message, args: Array<string>): void | Promise<void | Message>;
 }

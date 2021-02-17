@@ -13,6 +13,7 @@ export const command: Command = {
   args: true,
   usage: '<member> <reason>',
   permissions: [permissions.KICK_MEMBERS],
+  aliases: ['k'],
   async execute(message: Message, args: Array<string>): Promise<void | Message> {
     const memberToKick = await resolveMentionedMember(message, args);
     if (!memberToKick) return message.channel.send('That user is not a member of this server');

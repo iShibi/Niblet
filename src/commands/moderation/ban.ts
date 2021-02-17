@@ -13,6 +13,7 @@ export const command: Command = {
   args: true,
   usage: '<member> <reason>',
   permissions: [permissions.BAN_MEMBERS],
+  aliases: ['b'],
   async execute(message: Message, args: Array<string>): Promise<void | Message> {
     const memberToBan = await resolveMentionedMember(message, args);
     if (!memberToBan) return message.channel.send('That user is not a member of this server');

@@ -13,6 +13,7 @@ export const command: Command = {
   args: true,
   usage: '<member> <reason>',
   permissions: [permissions.BAN_MEMBERS],
+  aliases: ['sb'],
   async execute(message: Message, args: Array<string>): Promise<void | Message> {
     const memberToSoftban = await resolveMentionedMember(message, args);
     if (!memberToSoftban) return message.channel.send('Not a valid user.');

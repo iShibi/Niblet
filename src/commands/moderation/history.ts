@@ -13,6 +13,7 @@ export const command: Command = {
   args: true,
   usage: '<member>',
   permissions: [permissions.KICK_MEMBERS],
+  aliases: ['h'],
   async execute(message: Message, args: Array<string>): Promise<Message | void> {
     let mentionedMemberOrUser = (await resolveMentionedMember(message, args))?.user as User;
     if (!mentionedMemberOrUser) {
