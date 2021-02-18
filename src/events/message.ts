@@ -42,7 +42,7 @@ export const event = (
   }
 
   try {
-    command.execute(message, args);
+    command.execute(message, args, commands);
   } catch (error) {
     console.log(error);
     message.channel.send('There was an error!');

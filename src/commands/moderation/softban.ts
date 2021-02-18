@@ -14,6 +14,8 @@ export const command: Command = {
   usage: '<member> <reason>',
   permissions: [permissions.BAN_MEMBERS],
   aliases: ['sb'],
+  description: 'Ban and Unban a user to delete their messages',
+  category: 'moderation',
   async execute(message: Message, args: Array<string>): Promise<void | Message> {
     const memberToSoftban = await resolveMentionedMember(message, args);
     if (!memberToSoftban) return message.channel.send('Not a valid user.');

@@ -14,6 +14,8 @@ export const command: Command = {
   usage: '<member>',
   permissions: [permissions.KICK_MEMBERS],
   aliases: ['h'],
+  description: 'Get the history of a user',
+  category: 'moderation',
   async execute(message: Message, args: Array<string>): Promise<Message | void> {
     let mentionedMemberOrUser = (await resolveMentionedMember(message, args))?.user as User;
     if (!mentionedMemberOrUser) {

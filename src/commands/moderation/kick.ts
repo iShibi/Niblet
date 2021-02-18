@@ -14,6 +14,8 @@ export const command: Command = {
   usage: '<member> <reason>',
   permissions: [permissions.KICK_MEMBERS],
   aliases: ['k'],
+  description: 'Kick a user from the guild',
+  category: 'moderation',
   async execute(message: Message, args: Array<string>): Promise<void | Message> {
     const memberToKick = await resolveMentionedMember(message, args);
     if (!memberToKick) return message.channel.send('That user is not a member of this server');

@@ -13,6 +13,8 @@ export const command: Command = {
   args: true,
   usage: '<member> <reason>',
   permissions: [permissions.BAN_MEMBERS],
+  description: 'Unban a user',
+  category: 'moderation',
   async execute(message: Message, args: Array<string>): Promise<void | Message> {
     const userToUnban = await resolveMentionedUser(message, args);
     if (!userToUnban) return message.channel.send('Not a valid user.');

@@ -13,6 +13,8 @@ export const command: Command = {
   usage: '<member> <reason>',
   permissions: [permissions.KICK_MEMBERS],
   aliases: ['w'],
+  description: 'Warn a member of the guild',
+  category: 'moderation',
   async execute(message: Message, args: Array<string>): Promise<Message | void> {
     const mentionedMember = await resolveMentionedMember(message, args);
     if (!mentionedMember) return message.channel.send('Provide a valid member in the command!');

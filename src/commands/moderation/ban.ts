@@ -14,6 +14,8 @@ export const command: Command = {
   usage: '<member> <reason>',
   permissions: [permissions.BAN_MEMBERS],
   aliases: ['b'],
+  description: 'Ban a member from the guild',
+  category: 'moderation',
   async execute(message: Message, args: Array<string>): Promise<void | Message> {
     const memberToBan = await resolveMentionedMember(message, args);
     if (!memberToBan) return message.channel.send('That user is not a member of this server');
