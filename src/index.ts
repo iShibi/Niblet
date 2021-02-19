@@ -1,14 +1,14 @@
 import { Client, Collection } from 'discord.js';
 import fs from 'fs';
 import mongoose from 'mongoose';
+import { NIBLET_ATLAS_URI, BOT_TOKEN } from './config.js';
 
 // type imports
 import type { Command } from './interfaces/Command';
 
-const URI: string = process.env.NIBLET_ATLAS_URI as string;
 mongoose
-  .connect(URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(res => console.log('Connected to MongoDB Atlas'))
+  .connect(NIBLET_ATLAS_URI as string, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connected to MongoDB Atlas'))
   .catch(err => console.log('There was an error', err));
 
 const client: Client = new Client();
@@ -31,4 +31,4 @@ eventFiles.forEach(async file => {
   client.on(eventName, (...args: Array<string>) => eventModule.event(...args, client, commands));
 });
 
-client.login(process.env.BOT_TOKEN);
+client.login(BOT_TOKEN);
