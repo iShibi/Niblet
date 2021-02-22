@@ -10,6 +10,7 @@ export interface UserSchemaInterface extends mongoose.Document {
   kicks: number;
   softbans: number;
   bans: number;
+  roles: Array<string>;
 }
 
 const UserSchema: mongoose.Schema = new mongoose.Schema({
@@ -22,6 +23,7 @@ const UserSchema: mongoose.Schema = new mongoose.Schema({
   kicks: { type: Number, default: 0 },
   softbans: { type: Number, default: 0 },
   bans: { type: Number, default: 0 },
+  roles: { type: Array },
 });
 
 export default mongoose.model<UserSchemaInterface>('user', UserSchema);
