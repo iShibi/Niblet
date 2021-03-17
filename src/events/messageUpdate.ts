@@ -2,8 +2,12 @@
 
 import type { Message } from 'discord.js';
 import { logEditedMessage } from '../features/editedMessageLogger.js';
+import type { Event } from '../interfaces/Event';
 
-export const event = (oldMessage: Message, newMessage: Message): void => {
-  if (oldMessage.content === newMessage.content) return;
-  logEditedMessage(oldMessage, newMessage);
+export const event: Event = {
+  name: 'messageUpdate',
+  execute(oldMessage: Message, newMessage: Message): void {
+    if (oldMessage.content === newMessage.content) return;
+    logEditedMessage(oldMessage, newMessage);
+  },
 };
