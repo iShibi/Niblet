@@ -22,6 +22,7 @@ export function log(member: GuildMember, logType: string): void {
   const logEmbed: MessageEmbed = new MessageEmbed();
 
   logEmbed.setAuthor(`${member.user.tag} (${member.user.id})`, member.user.displayAvatarURL());
+  logEmbed.setThumbnail(member.user.displayAvatarURL());
   logEmbed.setDescription(description);
   logEmbed.setColor(embedColor);
   logEmbed.setFooter(footer);
