@@ -2,9 +2,8 @@ import { Client, Collection } from 'discord.js';
 import fs from 'fs';
 import mongoose from 'mongoose';
 import { NIBLET_ATLAS_URI, BOT_TOKEN } from './config.js';
-
-// type imports
 import type { Command } from './interfaces/Command';
+import type { Event } from './interfaces/Event';
 
 mongoose
   .connect(NIBLET_ATLAS_URI as string, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -27,8 +26,12 @@ commandFolders.forEach(folder => {
 const eventFiles: Array<string> = fs.readdirSync('./src/events').filter(file => file.endsWith('.js'));
 eventFiles.forEach(async file => {
   const eventModule = await import(`./events/${file}`);
-  const eventName = file.slice(0, -3);
-  client.on(eventName, (...args: Array<string>) => eventModule.event(...args, client, commands));
+  const event: Event = eventModule.event;
+  if (event.once) {
+    client.once(event.name, (...args: Array<string>) => event.execute(...args, client, commands));
+  } else {
+    client.on(event.name, (...args: Array<string>) => event.execute(...args, client, commands));
+  }
 });
 
 client.login(BOT_TOKEN);

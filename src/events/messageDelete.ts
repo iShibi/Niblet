@@ -2,7 +2,11 @@
 
 import type { Message } from 'discord.js';
 import { logDeletedMessage } from '../features/deletedMessageLogger.js';
+import type { Event } from '../interfaces/Event';
 
-export const event = (message: Message): void => {
-  logDeletedMessage(message);
+export const event: Event = {
+  name: 'messageDelete',
+  execute(message: Message): void {
+    logDeletedMessage(message);
+  },
 };
