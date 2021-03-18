@@ -28,7 +28,7 @@ eventFiles.forEach(async file => {
   const eventModule = await import(`./events/${file}`);
   const event: Event = eventModule.event;
   if (event.once) {
-    client.on(event.name, (...args: Array<string>) => event.execute(...args, client, commands));
+    client.once(event.name, (...args: Array<string>) => event.execute(...args, client, commands));
   } else {
     client.on(event.name, (...args: Array<string>) => event.execute(...args, client, commands));
   }
