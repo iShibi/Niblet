@@ -4,7 +4,7 @@ import type { Command } from '../../interfaces/Command';
 import type { Message } from 'discord.js';
 import { permissions } from '../../utils/Constants.js';
 import { resolveMentionedUser } from '../../utils/Utility.js';
-import UserSchema from '../../schemas/user.js';
+import UserModel from '../../schemas/user.js';
 import type { UserSchemaInterface } from '../../schemas/user.js';
 import { makeUserHistoryEmbed } from '../../features/userHistoryEmbed.js';
 
@@ -22,7 +22,7 @@ export const command: Command = {
     const reason = `Unbanned by ${message.author.tag} | ${args.slice(1).join(' ')}`;
 
     try {
-      UserSchema.findOne({ id: userToUnban.id }, (err: Error, doc: UserSchemaInterface) => {
+      UserModel.findOne({ id: userToUnban.id }, (err: Error, doc: UserSchemaInterface) => {
         if (err) {
           console.log(err);
           return message.channel.send('An error occured!');

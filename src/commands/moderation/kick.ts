@@ -4,7 +4,7 @@ import type { Command } from '../../interfaces/Command';
 import type { Message } from 'discord.js';
 import { permissions } from '../../utils/Constants.js';
 import { resolveMentionedMember } from '../../utils/Utility.js';
-import UserSchema from '../../schemas/user.js';
+import UserModel from '../../schemas/user.js';
 import type { UserSchemaInterface } from '../../schemas/user.js';
 import { makeUserHistoryEmbed } from '../../features/userHistoryEmbed.js';
 
@@ -25,7 +25,7 @@ export const command: Command = {
     const authorCanKick = message.member?.roles.highest.comparePositionTo(memberToKick.roles.highest) as number;
     if (memberToKick.kickable && (authorCanKick > 0 || message.member?.id === message.guild?.ownerID)) {
       try {
-        UserSchema.findOne({ id: memberToKick.id }, (err: Error, doc: UserSchemaInterface) => {
+        UserModel.findOne({ id: memberToKick.id }, (err: Error, doc: UserSchemaInterface) => {
           if (err) {
             console.log(err);
             return message.channel.send('An error occured!');
@@ -45,14 +45,14 @@ export const command: Command = {
         if (!reply) return message.channel.send(`${message.author} you took too much time!`);
         if (reply === 'y' || reply === 'yes') {
           await memberToKick.kick(reason);
-          UserSchema.findOne({ id: memberToKick.id }, (err: Error, doc: UserSchemaInterface) => {
+          UserModel.findOne({ id: memberToKick.id }, (err: Error, doc: UserSchemaInterface) => {
             if (err) {
               console.log(err);
             } else if (doc) {
               doc.kicks += 1;
               doc.save();
             } else {
-              const newUserDoc = new UserSchema({
+              const newUserDoc = new UserModel({
                 username: memberToKick.user.username,
                 id: memberToKick.id,
                 tag: memberToKick.user.tag,

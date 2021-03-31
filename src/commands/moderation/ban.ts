@@ -4,7 +4,7 @@ import type { Command } from '../../interfaces/Command';
 import type { Message } from 'discord.js';
 import { permissions } from '../../utils/Constants.js';
 import { resolveMentionedMember } from '../../utils/Utility.js';
-import UserSchema from '../../schemas/user.js';
+import UserModel from '../../schemas/user.js';
 import type { UserSchemaInterface } from '../../schemas/user.js';
 import { makeUserHistoryEmbed } from '../../features/userHistoryEmbed.js';
 
@@ -25,7 +25,7 @@ export const command: Command = {
     const authorCanBan = message.member?.roles.highest.comparePositionTo(memberToBan.roles.highest) as number;
     if (memberToBan.bannable && (authorCanBan > 0 || message.member?.id === message.guild?.ownerID)) {
       try {
-        UserSchema.findOne({ id: memberToBan.id }, (err: Error, doc: UserSchemaInterface) => {
+        UserModel.findOne({ id: memberToBan.id }, (err: Error, doc: UserSchemaInterface) => {
           if (err) {
             console.log(err);
             return message.channel.send('An error occured!');
@@ -45,14 +45,14 @@ export const command: Command = {
         if (!reply) return message.channel.send(`${message.author} you took too much time!`);
         if (reply === 'y' || reply === 'yes') {
           await memberToBan.ban({ reason: reason, days: 7 });
-          UserSchema.findOne({ id: memberToBan.id }, (err: Error, doc: UserSchemaInterface) => {
+          UserModel.findOne({ id: memberToBan.id }, (err: Error, doc: UserSchemaInterface) => {
             if (err) {
               console.log(err);
             } else if (doc) {
               doc.bans += 1;
               doc.save();
             } else {
-              const newUserDoc = new UserSchema({
+              const newUserDoc = new UserModel({
                 username: memberToBan.user.username,
                 id: memberToBan.id,
                 tag: memberToBan.user.tag,

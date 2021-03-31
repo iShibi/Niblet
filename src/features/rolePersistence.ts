@@ -2,10 +2,10 @@
 
 import type { GuildMember } from 'discord.js';
 import type { UserSchemaInterface } from '../schemas/user.js';
-import UserSchema from '../schemas/user.js';
+import UserModel from '../schemas/user.js';
 
 export function storeMemberRoles(member: GuildMember): void {
-  UserSchema.findOne({ id: member.id }, (err: Error, doc: UserSchemaInterface) => {
+  UserModel.findOne({ id: member.id }, (err: Error, doc: UserSchemaInterface) => {
     if (err) {
       console.log(err);
     } else if (doc) {
@@ -13,7 +13,7 @@ export function storeMemberRoles(member: GuildMember): void {
       doc.roles = roleIds;
       doc.save();
     } else {
-      const newUserDoc = new UserSchema({
+      const newUserDoc = new UserModel({
         username: member.user.username,
         id: member.id,
         tag: member.user.tag,
@@ -25,7 +25,7 @@ export function storeMemberRoles(member: GuildMember): void {
 }
 
 export function addRolesBack(member: GuildMember): void {
-  UserSchema.findOne({ id: member.id }, (err: Error, doc: UserSchemaInterface) => {
+  UserModel.findOne({ id: member.id }, (err: Error, doc: UserSchemaInterface) => {
     if (err) {
       console.log(err);
     } else if (doc) {
