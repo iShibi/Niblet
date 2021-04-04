@@ -5,7 +5,7 @@ import type { UserSchemaInterface } from '../schemas/user.js';
 import UserModel from '../schemas/user.js';
 
 export function storeMemberRoles(member: GuildMember): void {
-  UserModel.findOne({ id: member.id }, (err: Error, doc: UserSchemaInterface) => {
+  UserModel.findOne({ id: member.id, guildId: member.guild.id }, (err: Error, doc: UserSchemaInterface) => {
     if (err) {
       console.log(err);
     } else if (doc) {
@@ -18,6 +18,7 @@ export function storeMemberRoles(member: GuildMember): void {
         id: member.id,
         tag: member.user.tag,
         roles: member.roles.cache.map(role => role.id).filter(id => id != member.guild.id),
+        guildId: member.guild.id,
       });
       newUserDoc.save();
     }
@@ -25,7 +26,7 @@ export function storeMemberRoles(member: GuildMember): void {
 }
 
 export function addRolesBack(member: GuildMember): void {
-  UserModel.findOne({ id: member.id }, (err: Error, doc: UserSchemaInterface) => {
+  UserModel.findOne({ id: member.id, guildId: member.guild.id }, (err: Error, doc: UserSchemaInterface) => {
     if (err) {
       console.log(err);
     } else if (doc) {

@@ -22,23 +22,27 @@ export const command: Command = {
     if (!reason) return message.reply('Provide a valid reason for the warning.');
 
     if (mentionedMember) {
-      UserModel.findOne({ id: mentionedMember.id }, (err: Error, doc: UserSchemaInterface) => {
-        if (err) {
-          console.log(err);
-          return message.channel.send('An error occured!');
-        } else if (doc) {
-          doc.warnings += 1;
-          doc.save();
-        } else {
-          const newUserDoc = new UserModel({
-            username: mentionedMember.user.username,
-            id: mentionedMember.id,
-            tag: mentionedMember.user.tag,
-            warnings: 1,
-          });
-          newUserDoc.save();
-        }
-      });
+      UserModel.findOne(
+        { id: mentionedMember.id, guildId: mentionedMember.guild.id },
+        (err: Error, doc: UserSchemaInterface) => {
+          if (err) {
+            console.log(err);
+            return message.channel.send('An error occured!');
+          } else if (doc) {
+            doc.warnings += 1;
+            doc.save();
+          } else {
+            const newUserDoc = new UserModel({
+              username: mentionedMember.user.username,
+              id: mentionedMember.id,
+              tag: mentionedMember.user.tag,
+              warnings: 1,
+              guildId: mentionedMember.guild.id,
+            });
+            newUserDoc.save();
+          }
+        },
+      );
       return message.channel.send(`Warning for ${mentionedMember}: ${reason}`);
     }
   },

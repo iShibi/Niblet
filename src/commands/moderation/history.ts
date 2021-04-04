@@ -22,14 +22,18 @@ export const command: Command = {
       mentionedMemberOrUser = (await resolveMentionedUser(message, args)) as User;
     }
     if (!mentionedMemberOrUser) return message.channel.send('Provide a valid user');
-    UserModel.findOne({ id: mentionedMemberOrUser.id }, (err: Error, doc: UserSchemaInterface) => {
-      if (err) {
-        console.log(err);
-        return message.channel.send('An error occured!');
-      } else {
-        const historyEmbed = makeUserHistoryEmbed(doc, mentionedMemberOrUser);
-        if (historyEmbed) return message.channel.send(historyEmbed);
-      }
-    });
+    // !!check what this does in DM
+    UserModel.findOne(
+      { id: mentionedMemberOrUser.id, guildId: message.guild?.id },
+      (err: Error, doc: UserSchemaInterface) => {
+        if (err) {
+          console.log(err);
+          return message.channel.send('An error occured!');
+        } else {
+          const historyEmbed = makeUserHistoryEmbed(doc, mentionedMemberOrUser);
+          if (historyEmbed) return message.channel.send(historyEmbed);
+        }
+      },
+    );
   },
 };

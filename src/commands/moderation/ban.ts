@@ -25,15 +25,18 @@ export const command: Command = {
     const authorCanBan = message.member?.roles.highest.comparePositionTo(memberToBan.roles.highest) as number;
     if (memberToBan.bannable && (authorCanBan > 0 || message.member?.id === message.guild?.ownerID)) {
       try {
-        UserModel.findOne({ id: memberToBan.id }, (err: Error, doc: UserSchemaInterface) => {
-          if (err) {
-            console.log(err);
-            return message.channel.send('An error occured!');
-          } else {
-            const historyEmbed = makeUserHistoryEmbed(doc, memberToBan.user);
-            message.channel.send(`Are you sure you want to ban ${memberToBan.user}?`, historyEmbed);
-          }
-        });
+        UserModel.findOne(
+          { id: memberToBan.id, guildId: memberToBan.guild.id },
+          (err: Error, doc: UserSchemaInterface) => {
+            if (err) {
+              console.log(err);
+              return message.channel.send('An error occured!');
+            } else {
+              const historyEmbed = makeUserHistoryEmbed(doc, memberToBan.user);
+              message.channel.send(`Are you sure you want to ban ${memberToBan.user}?`, historyEmbed);
+            }
+          },
+        );
 
         const filter = (msg: Message) => msg.author.id === message.author.id;
         const confirmationMessageCollection = await message.channel.awaitMessages(filter, {
@@ -45,22 +48,26 @@ export const command: Command = {
         if (!reply) return message.channel.send(`${message.author} you took too much time!`);
         if (reply === 'y' || reply === 'yes') {
           await memberToBan.ban({ reason: reason, days: 7 });
-          UserModel.findOne({ id: memberToBan.id }, (err: Error, doc: UserSchemaInterface) => {
-            if (err) {
-              console.log(err);
-            } else if (doc) {
-              doc.bans += 1;
-              doc.save();
-            } else {
-              const newUserDoc = new UserModel({
-                username: memberToBan.user.username,
-                id: memberToBan.id,
-                tag: memberToBan.user.tag,
-                bans: 1,
-              });
-              newUserDoc.save();
-            }
-          });
+          UserModel.findOne(
+            { id: memberToBan.id, guildId: memberToBan.guild.id },
+            (err: Error, doc: UserSchemaInterface) => {
+              if (err) {
+                console.log(err);
+              } else if (doc) {
+                doc.bans += 1;
+                doc.save();
+              } else {
+                const newUserDoc = new UserModel({
+                  username: memberToBan.user.username,
+                  id: memberToBan.id,
+                  tag: memberToBan.user.tag,
+                  bans: 1,
+                  guildId: memberToBan.guild.id,
+                });
+                newUserDoc.save();
+              }
+            },
+          );
           return message.channel.send(`Successfully banned ${memberToBan.user.tag}`);
         } else if (reply === 'n' || reply === 'no') {
           return message.channel.send('Fine, not today. Command canceled.');

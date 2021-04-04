@@ -22,7 +22,7 @@ export const command: Command = {
     const reason = `Unbanned by ${message.author.tag} | ${args.slice(1).join(' ')}`;
 
     try {
-      UserModel.findOne({ id: userToUnban.id }, (err: Error, doc: UserSchemaInterface) => {
+      UserModel.findOne({ id: userToUnban.id, guildId: message.guild?.id }, (err: Error, doc: UserSchemaInterface) => {
         if (err) {
           console.log(err);
           return message.channel.send('An error occured!');

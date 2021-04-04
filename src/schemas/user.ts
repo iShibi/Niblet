@@ -11,6 +11,7 @@ export interface UserSchemaInterface extends mongoose.Document {
   softbans: number;
   bans: number;
   roles: Array<string>;
+  guildId: string;
 }
 
 const UserSchema: mongoose.Schema = new mongoose.Schema({
@@ -24,6 +25,7 @@ const UserSchema: mongoose.Schema = new mongoose.Schema({
   softbans: { type: Number, default: 0 },
   bans: { type: Number, default: 0 },
   roles: { type: Array },
+  guildId: String,
 });
 
 export default mongoose.model<UserSchemaInterface>('user', UserSchema);
