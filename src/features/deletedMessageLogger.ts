@@ -1,13 +1,12 @@
-'use strict';
-
-import type { Message, TextChannel } from 'discord.js';
-import { MESSAGE_LOGS_CHANNEL_ID } from '../config.js';
+import { guildsInfo } from '../index.js';
 import { MessageEmbed } from 'discord.js';
+import type { Message, TextChannel } from 'discord.js';
 
 export function logDeletedMessage(message: Message): void {
-  if (message.channel.id === MESSAGE_LOGS_CHANNEL_ID) return;
+  const messageLogsChannelId = guildsInfo.get(message.guild?.id as string)?.messageLogsChannelId ?? null;
+  if (message.channel.id === messageLogsChannelId) return;
 
-  const channel = message.guild?.channels.cache.find(channel => channel.id === MESSAGE_LOGS_CHANNEL_ID) as TextChannel;
+  const channel = message.guild?.channels.cache.find(channel => channel.id === messageLogsChannelId) as TextChannel;
   if (!channel) return;
 
   const logEmbed = new MessageEmbed()

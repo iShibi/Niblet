@@ -1,8 +1,6 @@
-'use strict';
-
-import type { GuildMember, TextChannel } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
-import { MEMBER_LOGS_CHANNEL_ID } from '../config.js';
+import { guildsInfo } from '../index.js';
+import type { GuildMember, TextChannel } from 'discord.js';
 
 export function log(member: GuildMember, logType: string): void {
   let description = `• Profile: ${member}\n• Created: \`${member.user.createdAt.toUTCString()}\`\n• Joined: \`${member.joinedAt?.toUTCString()}\``;
@@ -29,7 +27,7 @@ export function log(member: GuildMember, logType: string): void {
   logEmbed.setTimestamp();
 
   const memberLogChannel: TextChannel = member.guild.channels.cache.find(
-    channel => channel.id === MEMBER_LOGS_CHANNEL_ID,
+    channel => channel.id === guildsInfo.get(member.guild.id)?.memberLogsChannelId,
   ) as TextChannel;
   if (memberLogChannel) {
     memberLogChannel.send(logEmbed);

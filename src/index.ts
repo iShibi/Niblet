@@ -36,7 +36,6 @@ eventFiles.forEach(async file => {
   }
 });
 
-// fetch info about all guilds from db
 export const guildsInfo: Collection<string, GuildSchemaInterface> = new Collection();
 GuildModel.find({}, (err: Error, docs: Array<GuildSchemaInterface>) => {
   if (err) {
