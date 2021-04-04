@@ -9,7 +9,13 @@ import { PREFIX } from '../config.js';
 export const event: Event = {
   name: 'message',
   execute(message: Message, client: Client, commands: Collection<string, Command>): Promise<Message> | void {
-    if (message.author.bot || !message.content.startsWith(PREFIX) || message.content.length <= PREFIX.length) return;
+    if (
+      message.author.bot ||
+      !message.content.startsWith(PREFIX) ||
+      message.content.length <= PREFIX.length ||
+      message.channel.type === 'dm'
+    )
+      return;
 
     const words: Array<string> = message.content.slice(PREFIX.length).trim().split(/ +/);
     const commandName: string = words[0];
