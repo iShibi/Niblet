@@ -1,8 +1,6 @@
-'use strict';
-
+import UserModel from '../schemas/user.js';
 import type { GuildMember } from 'discord.js';
 import type { UserSchemaInterface } from '../schemas/user.js';
-import UserModel from '../schemas/user.js';
 
 export function storeMemberRoles(member: GuildMember): void {
   UserModel.findOne({ id: member.id, guildId: member.guild.id }, (err: Error, doc: UserSchemaInterface) => {

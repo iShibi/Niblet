@@ -1,5 +1,3 @@
-'use strict';
-
 import type { Command } from '../../interfaces/Command';
 import type { Message, TextChannel } from 'discord.js';
 

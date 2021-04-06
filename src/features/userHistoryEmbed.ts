@@ -1,7 +1,5 @@
-'use strict';
-
-import type { UserSchemaInterface } from '../schemas/user.js';
 import { MessageEmbed } from 'discord.js';
+import type { UserSchemaInterface } from '../schemas/user.js';
 import type { User } from 'discord.js';
 
 export function makeUserHistoryEmbed(data: UserSchemaInterface, user: User): MessageEmbed {

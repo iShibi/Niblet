@@ -1,5 +1,3 @@
-'use strict';
-
 import type { Message } from 'discord.js';
 import type { Command } from '../../interfaces/Command';
 

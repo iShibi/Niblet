@@ -1,9 +1,7 @@
-'use strict';
-
-import type { Command } from '../../interfaces/Command';
-import type { Message, Collection } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
 import { PREFIX } from '../../config.js';
+import type { Command } from '../../interfaces/Command';
+import type { Message, Collection } from 'discord.js';
 
 export const command: Command = {
   name: 'help',

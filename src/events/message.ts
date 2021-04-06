@@ -1,10 +1,7 @@
-'use strict';
-
+import { PREFIX } from '../config.js';
 import type { Message, Client, Collection, GuildChannel, GuildMember, PermissionResolvable } from 'discord.js';
 import type { Command } from '../interfaces/Command';
 import type { Event } from '../interfaces/Event';
-
-import { PREFIX } from '../config.js';
 
 export const event: Event = {
   name: 'message',

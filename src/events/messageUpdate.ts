@@ -1,7 +1,5 @@
-'use strict';
-
-import type { Message } from 'discord.js';
 import { logEditedMessage } from '../features/editedMessageLogger.js';
+import type { Message } from 'discord.js';
 import type { Event } from '../interfaces/Event';
 
 export const event: Event = {
