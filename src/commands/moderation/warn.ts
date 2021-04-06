@@ -1,17 +1,15 @@
-'use strict';
-
+import { resolveMentionedMember } from '../../utils/Utility.js';
+import { Permissions } from 'discord.js';
+import UserModel from '../../schemas/user.js';
 import type { Command } from '../../interfaces/Command';
 import type { Message } from 'discord.js';
-import { resolveMentionedMember } from '../../utils/Utility.js';
-import { permissions } from '../../utils/Constants.js';
-import UserModel from '../../schemas/user.js';
 import type { UserSchemaInterface } from '../../schemas/user.js';
 
 export const command: Command = {
   name: 'warn',
   args: true,
   usage: '<member> <reason>',
-  permissions: [permissions.KICK_MEMBERS],
+  permissions: [Permissions.FLAGS.KICK_MEMBERS],
   aliases: ['w'],
   description: 'Warn a member of the guild',
   category: 'moderation',

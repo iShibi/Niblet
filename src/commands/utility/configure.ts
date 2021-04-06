@@ -1,7 +1,6 @@
 import { guildsInfo } from '../../index.js';
 import GuildModel from '../../schemas/guild.js';
-import { MessageEmbed } from 'discord.js';
-import { permissions } from '../../utils/Constants.js';
+import { MessageEmbed, Permissions } from 'discord.js';
 import type { Command } from '../../interfaces/Command';
 import type { Message } from 'discord.js';
 import type { GuildSchemaInterface } from '../../schemas/guild.js';
@@ -12,7 +11,7 @@ export const command: Command = {
   category: 'utility',
   usage: '--set <key> <value> OR --view',
   args: true,
-  permissions: [permissions.ADMINISTRATOR],
+  permissions: [Permissions.FLAGS.ADMINISTRATOR],
   async execute(message: Message, args: Array<string>): Promise<Message | undefined> {
     const keys = ['name', 'id', 'memberLogsChannelId', 'messageLogsChannelId'];
     if (args[0] === '--set') {

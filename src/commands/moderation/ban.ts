@@ -1,18 +1,16 @@
-'use strict';
-
-import type { Command } from '../../interfaces/Command';
-import type { Message } from 'discord.js';
-import { permissions } from '../../utils/Constants.js';
+import { Permissions } from 'discord.js';
 import { resolveMentionedMember } from '../../utils/Utility.js';
 import UserModel from '../../schemas/user.js';
-import type { UserSchemaInterface } from '../../schemas/user.js';
 import { makeUserHistoryEmbed } from '../../features/userHistoryEmbed.js';
+import type { Command } from '../../interfaces/Command';
+import type { Message } from 'discord.js';
+import type { UserSchemaInterface } from '../../schemas/user.js';
 
 export const command: Command = {
   name: 'ban',
   args: true,
   usage: '<member> <reason>',
-  permissions: [permissions.BAN_MEMBERS],
+  permissions: [Permissions.FLAGS.BAN_MEMBERS],
   aliases: ['b'],
   description: 'Ban a member from the guild',
   category: 'moderation',

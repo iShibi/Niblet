@@ -1,18 +1,16 @@
-'use strict';
-
-import type { Command } from '../../interfaces/Command';
-import type { Message } from 'discord.js';
-import { permissions } from '../../utils/Constants.js';
+import { Permissions } from 'discord.js';
 import { resolveMentionedMember } from '../../utils/Utility.js';
 import UserModel from '../../schemas/user.js';
-import type { UserSchemaInterface } from '../../schemas/user.js';
 import { makeUserHistoryEmbed } from '../../features/userHistoryEmbed.js';
+import type { UserSchemaInterface } from '../../schemas/user.js';
+import type { Command } from '../../interfaces/Command';
+import type { Message } from 'discord.js';
 
 export const command: Command = {
   name: 'softban',
   args: true,
   usage: '<member> <reason>',
-  permissions: [permissions.BAN_MEMBERS],
+  permissions: [Permissions.FLAGS.BAN_MEMBERS],
   aliases: ['sb'],
   description: 'Ban and Unban a user to delete their messages',
   category: 'moderation',

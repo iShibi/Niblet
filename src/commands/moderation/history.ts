@@ -1,18 +1,16 @@
-'use strict';
-
-import type { Command } from '../../interfaces/Command';
-import type { Message, User } from 'discord.js';
-import { permissions } from '../../utils/Constants.js';
+import { Permissions } from 'discord.js';
 import { resolveMentionedMember, resolveMentionedUser } from '../../utils/Utility.js';
 import UserModel from '../../schemas/user.js';
-import type { UserSchemaInterface } from '../../schemas/user.js';
 import { makeUserHistoryEmbed } from '../../features/userHistoryEmbed.js';
+import type { UserSchemaInterface } from '../../schemas/user.js';
+import type { Command } from '../../interfaces/Command';
+import type { Message, User } from 'discord.js';
 
 export const command: Command = {
   name: 'history',
   args: true,
   usage: '<member>',
-  permissions: [permissions.KICK_MEMBERS],
+  permissions: [Permissions.FLAGS.KICK_MEMBERS],
   aliases: ['h'],
   description: 'Get the history of a user',
   category: 'moderation',

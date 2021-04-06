@@ -1,7 +1,1 @@
-'use strict';
-
-export const permissions = {
-  KICK_MEMBERS: 'KICK_MEMBERS',
-  BAN_MEMBERS: 'BAN_MEMBERS',
-  ADMINISTRATOR: 'ADMINISTRATOR',
-};
+// the only that was here got removed, still keeping this file for future use

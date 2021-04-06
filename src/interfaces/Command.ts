@@ -1,10 +1,10 @@
-import type { Message, Collection } from 'discord.js';
+import type { Message, Collection, PermissionResolvable } from 'discord.js';
 
 export interface Command {
   name: string;
   args?: boolean;
   usage?: string;
-  permissions?: Array<string>;
+  permissions?: Array<PermissionResolvable>;
   aliases?: Array<string>;
   description: string;
   category: string;

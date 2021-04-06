@@ -1,18 +1,16 @@
-'use strict';
-
-import type { Command } from '../../interfaces/Command';
-import type { Message } from 'discord.js';
-import { permissions } from '../../utils/Constants.js';
+import { Permissions } from 'discord.js';
 import { resolveMentionedUser } from '../../utils/Utility.js';
 import UserModel from '../../schemas/user.js';
-import type { UserSchemaInterface } from '../../schemas/user.js';
 import { makeUserHistoryEmbed } from '../../features/userHistoryEmbed.js';
+import type { UserSchemaInterface } from '../../schemas/user.js';
+import type { Command } from '../../interfaces/Command';
+import type { Message } from 'discord.js';
 
 export const command: Command = {
   name: 'unban',
   args: true,
   usage: '<member> <reason>',
-  permissions: [permissions.BAN_MEMBERS],
+  permissions: [Permissions.FLAGS.BAN_MEMBERS],
   description: 'Unban a user',
   category: 'moderation',
   async execute(message: Message, args: Array<string>): Promise<void | Message> {
