@@ -3,7 +3,7 @@ import type { Message, TextChannel } from 'discord.js';
 
 export const command: Command = {
   name: 'invite',
-  description: 'Sends an invite of the server',
+  description: 'Get an invite for the server',
   category: 'utility',
   async execute(message: Message): Promise<Message> {
     const channel = message.guild?.systemChannel as TextChannel;
