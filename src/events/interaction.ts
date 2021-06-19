@@ -6,7 +6,6 @@ export const event: Event = {
   once: false,
   async execute(interaction: Interaction, _, interactionCommands: Collection<string, InteractionCommand>) {
     if (interaction.isCommand()) {
-      interaction.defer({ ephemeral: true });
       try {
         interactionCommands.get(interaction.commandName)?.handle(interaction);
       } catch (error) {

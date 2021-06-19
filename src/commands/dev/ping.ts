@@ -1,4 +1,4 @@
-import type { InteractionCommand } from '../interfaces/index';
+import type { InteractionCommand } from '../../interfaces/index';
 
 export const interactionCommand: InteractionCommand = {
   data: {
@@ -6,7 +6,8 @@ export const interactionCommand: InteractionCommand = {
     description: 'Checks whether or not the bot is online',
   },
 
-  handle(interaction) {
+  async handle(interaction) {
+    await interaction.defer({ ephemeral: true });
     interaction.editReply('Pong!');
   },
 };

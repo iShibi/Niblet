@@ -9,5 +9,5 @@ export interface InteractionCommand {
   /**
    * The function to call when an interaction is recieved
    */
-  handle(interaction: CommandInteraction): void;
+  handle(interaction: CommandInteraction): Promise<void>;
 }

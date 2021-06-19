@@ -8,7 +8,8 @@ export const event: Event = {
     if (message.author.bot) return;
     if (message.content.includes('?deploy') && message.author.id === '620567262004248596') {
       const interactionCommandData = interactionCommands.map(interactionCommand => interactionCommand.data);
-      await message.guild?.commands.set(interactionCommandData);
+      const cmds = await message.guild?.commands.set(interactionCommandData);
+      message.channel.send(`Deployed \`${cmds?.size}\` interaction cmd(s).`);
     }
   },
 };

@@ -8,10 +8,14 @@ const client = new Client({
 });
 
 const interactionCommands = new Collection<string, InteractionCommand>();
-const interactionCommandFiles: Array<string> = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
-interactionCommandFiles.forEach(async file => {
-  const interactionCommand: InteractionCommand = (await import(`./commands/${file}`)).interactionCommand;
-  interactionCommands.set(interactionCommand.data.name, interactionCommand);
+
+const commandFolders = fs.readdirSync('./src/commands');
+commandFolders.forEach(folder => {
+  const interactionCommandFiles = fs.readdirSync(`./src/commands/${folder}`).filter(file => file.endsWith('.js'));
+  interactionCommandFiles.forEach(async file => {
+    const interactionCommand: InteractionCommand = (await import(`./commands/${folder}/${file}`)).interactionCommand;
+    interactionCommands.set(interactionCommand.data.name, interactionCommand);
+  });
 });
 
 const eventFiles: Array<string> = fs.readdirSync('./src/events').filter(file => file.endsWith('.js'));
