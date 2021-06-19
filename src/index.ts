@@ -1,8 +1,7 @@
 import fs from 'fs';
 import { Client, Collection } from 'discord.js';
 import { BOT_TOKEN } from './config.js';
-import type { Event } from './interfaces/Event';
-import type { InteractionCommand } from './interfaces/index';
+import type { Event, InteractionCommand } from './interfaces/index';
 
 const client = new Client({
   intents: ['GUILDS', 'GUILD_MESSAGES'],
