@@ -10,6 +10,9 @@
     "alwaysStrict": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "watch": true
-  }
+    "watch": true,
+  },
+  "include": [
+    "src"
+  ]
 }

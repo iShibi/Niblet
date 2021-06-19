@@ -1,5 +1,5 @@
 export interface Event {
   name: string;
   once?: boolean;
-  execute(...args: any): void;
+  execute(...args: Array<unknown>): void;
 }
