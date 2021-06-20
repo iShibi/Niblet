@@ -47,7 +47,8 @@ export const interactionCommand: InteractionCommand = {
     const response = await message.awaitMessageComponentInteraction(filter, { time: 15000 });
     if (response.customID === 'warn') {
       interaction.editReply({ content: `Warning for ${targetUser}: ${reason}`, embeds: [], components: [] });
-      if (userDoc && userDoc.warnings) {
+      if (userDoc) {
+        // @ts-ignore
         userDoc.warnings += 1;
         userDoc.save();
       } else {

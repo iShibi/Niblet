@@ -48,7 +48,8 @@ export const interactionCommand: InteractionCommand = {
     if (response.customID === 'kick') {
       const kickedMember = await interaction.guild?.members.kick(targetUser, `Kicked by ${author.tag} | ${reason}`);
       interaction.editReply({ content: `Successfully Kicked ${kickedMember}`, embeds: [], components: [] });
-      if (userDoc && userDoc.kicks) {
+      if (userDoc) {
+        // @ts-ignore
         userDoc.kicks += 1;
         userDoc.save();
       } else {
