@@ -1,6 +1,8 @@
+import { guildDocs } from '../index.js';
 import { MessageEmbed } from 'discord.js';
-import type { User } from 'discord.js';
-import type { UserSchema } from '../interfaces/index';
+import { GuildModel } from '../schemas/index.js';
+import type { Snowflake, User } from 'discord.js';
+import type { GuildDocument, UserSchema } from '../interfaces/index';
 
 /**
  * Creates an embed containing information about a user's history
@@ -17,4 +19,17 @@ export function createUserHistoryEmbed(data: UserSchema | null, user: User): Mes
     );
 
   return userHistoryEmbed;
+}
+
+/**
+ * Gets a guild document if it is cached, else fetches it from database
+ * @returns A guild document
+ */
+export async function getGuildDoc(guildID: Snowflake, force?: boolean): Promise<GuildDocument | null> {
+  if (!force) {
+    const guildDoc = guildDocs.get(guildID);
+    if (guildDoc) return guildDoc;
+  }
+  const guildDoc = await GuildModel.findOne({ id: guildID }).exec();
+  return guildDoc;
 }

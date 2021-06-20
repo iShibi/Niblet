@@ -2,7 +2,8 @@ import fs from 'fs';
 import mongoose from 'mongoose';
 import { Client, Collection } from 'discord.js';
 import { BOT_TOKEN, NIBLET_ATLAS_URI } from './config.js';
-import type { Event, InteractionCommand } from './interfaces/index';
+import type { Snowflake } from 'discord.js';
+import type { Event, GuildDocument, InteractionCommand } from './interfaces/index';
 
 const client = new Client({
   intents: ['GUILDS', 'GUILD_MESSAGES'],
@@ -33,5 +34,7 @@ eventFiles.forEach(async file => {
     client.on(event.name, (...args: Array<string>) => event.execute(...args, client, interactionCommands));
   }
 });
+
+export const guildDocs = new Collection<Snowflake, GuildDocument>();
 
 client.login(BOT_TOKEN);
