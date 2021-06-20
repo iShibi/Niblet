@@ -1,2 +1,3 @@
 export * from './Event';
-export * from './InteractionCommand';
+export * from './Interaction';
+export * from './User';

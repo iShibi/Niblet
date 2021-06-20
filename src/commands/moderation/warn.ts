@@ -1,6 +1,7 @@
-import { Message, MessageActionRow, MessageButton } from 'discord.js';
+import { Message, MessageActionRow, MessageButton, User } from 'discord.js';
+import { createUserHistoryEmbed } from '../../utils/Utility.js';
 import type { MessageComponentInteraction } from 'discord.js';
-import type { InteractionCommand } from '../../interfaces/index';
+import type { InteractionCommand, UserSchema } from '../../interfaces/index';
 
 export const interactionCommand: InteractionCommand = {
   data: {
@@ -23,20 +24,28 @@ export const interactionCommand: InteractionCommand = {
   },
 
   async handle(interaction) {
+    await interaction.defer();
     const author = interaction.user;
-    const member = interaction.options.get('member')?.member;
+    const targetUser = interaction.options.get('member')?.user;
     const reason = interaction.options.get('reason')?.value;
     const buttonRow = new MessageActionRow().addComponents(
       new MessageButton().setCustomID('warn').setLabel('Warn').setStyle('DANGER'),
       new MessageButton().setCustomID('cancel_warn').setLabel('Cancel').setStyle('SECONDARY'),
     );
-    await interaction.reply({ content: `Do you want to warn ${member}?`, components: [buttonRow] });
+    // @ts-ignore
+    const userHistoryData: UserSchema = {};
+    const userHistoryEmbed = createUserHistoryEmbed(userHistoryData, targetUser as User);
+    await interaction.editReply({
+      content: `Do you want to warn this user?`,
+      embeds: [userHistoryEmbed],
+      components: [buttonRow],
+    });
     const message = (await interaction.fetchReply()) as Message;
     const filter = (i: MessageComponentInteraction) =>
       ['warn', 'cancel_warn'].includes(i.customID) && i.user.id === author.id;
     const response = await message.awaitMessageComponentInteraction(filter, { time: 15000 });
     if (response.customID === 'warn') {
-      interaction.editReply({ content: `Warning for ${member}: ${reason}`, components: [] });
+      interaction.editReply({ content: `Warning for ${targetUser}: ${reason}`, embeds: [], components: [] });
     } else {
       interaction.deleteReply();
     }
