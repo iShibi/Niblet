@@ -1,6 +1,7 @@
-import { Message, MessageActionRow, MessageButton, User } from 'discord.js';
-import { createUserHistoryEmbed } from '../../utils/Utility.js';
 import { UserModel } from '../../schemas/User.js';
+import { createUserHistoryEmbed } from '../../utils/Utility.js';
+import { Message, MessageActionRow, MessageButton } from 'discord.js';
+import type { User } from 'discord.js';
 import type { MessageComponentInteraction } from 'discord.js';
 import type { InteractionCommand, UserSchema } from '../../interfaces/index';
 
