@@ -24,6 +24,7 @@
   "homepage": "https://github.com/iShibi/Niblet#readme",
   "type": "module",
   "devDependencies": {
+    "@types/mongoose": "^5.11.97",
     "@types/node": "^15.12.4",
     "@typescript-eslint/eslint-plugin": "^4.27.0",
     "@typescript-eslint/parser": "^4.27.0",
@@ -34,6 +35,7 @@
     "typescript": "^4.3.4"
   },
   "dependencies": {
-    "discord.js": "^13.0.0-dev.807ea2d3c197c7c6556bd1c894114932f6657d49"
+    "discord.js": "^13.0.0-dev.807ea2d3c197c7c6556bd1c894114932f6657d49",
+    "mongoose": "^5.12.14"
   }
 }

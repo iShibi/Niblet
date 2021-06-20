@@ -1,11 +1,17 @@
 import fs from 'fs';
+import mongoose from 'mongoose';
 import { Client, Collection } from 'discord.js';
-import { BOT_TOKEN } from './config.js';
+import { BOT_TOKEN, NIBLET_ATLAS_URI } from './config.js';
 import type { Event, InteractionCommand } from './interfaces/index';
 
 const client = new Client({
   intents: ['GUILDS', 'GUILD_MESSAGES'],
 });
+
+mongoose
+  .connect(NIBLET_ATLAS_URI as string, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connected to MongoDB Atlas'))
+  .catch(err => console.log('There was an error:\n', err));
 
 const interactionCommands = new Collection<string, InteractionCommand>();
 

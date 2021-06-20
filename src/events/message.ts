@@ -9,7 +9,8 @@ export const event: Event = {
     if (message.content.includes('?deploy') && message.author.id === '620567262004248596') {
       const interactionCommandData = interactionCommands.map(interactionCommand => interactionCommand.data);
       const cmds = await message.guild?.commands.set(interactionCommandData);
-      message.channel.send(`Deployed \`${cmds?.size}\` interaction cmd(s).`);
+      if (cmds) message.channel.send(`Deployed \`${cmds.size}\` interaction ${cmds.size > 1 ? 'cmds' : 'cmd'}`);
+      else message.channel.send(`Deployed nothing`);
     }
   },
 };
