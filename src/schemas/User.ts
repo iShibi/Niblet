@@ -5,6 +5,7 @@ const userSchema: mongoose.Schema = new mongoose.Schema({
   username: String,
   id: String,
   tag: String,
+  guildID: String,
   warnings: { type: Number, default: 0 },
   restrictions: { type: Number, default: 0 },
   mutes: { type: Number, default: 0 },

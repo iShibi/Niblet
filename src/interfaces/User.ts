@@ -5,6 +5,7 @@ export interface UserSchema {
   username: string;
   id: Snowflake;
   tag: string;
+  guildID: Snowflake;
   warnings?: number;
   restrictions?: number;
   mutes?: number;

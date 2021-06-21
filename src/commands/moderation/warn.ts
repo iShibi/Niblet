@@ -1,8 +1,8 @@
 import { UserModel } from '../../schemas/User.js';
+import { MessageActionRow, MessageButton } from 'discord.js';
 import { createUserHistoryEmbed } from '../../utils/Utility.js';
-import { Message, MessageActionRow, MessageButton } from 'discord.js';
 import type { User } from 'discord.js';
-import type { MessageComponentInteraction } from 'discord.js';
+import type { Message, MessageComponentInteraction } from 'discord.js';
 import type { InteractionCommand, UserSchema } from '../../interfaces/index';
 
 export const interactionCommand: InteractionCommand = {
@@ -27,6 +27,10 @@ export const interactionCommand: InteractionCommand = {
 
   async handle(interaction) {
     await interaction.defer();
+    const guild = interaction.guild;
+    if (!guild) {
+      return interaction.editReply('This command is only valid in a guild');
+    }
     const author = interaction.user;
     const targetUser = interaction.options.get('member')?.user as User;
     const reason = interaction.options.get('reason')?.value;
@@ -34,7 +38,7 @@ export const interactionCommand: InteractionCommand = {
       new MessageButton().setCustomID('warn').setLabel('Warn').setStyle('DANGER'),
       new MessageButton().setCustomID('cancel_warn').setLabel('Cancel').setStyle('SECONDARY'),
     );
-    const userDoc = await UserModel.findOne({ id: targetUser?.id }).exec();
+    const userDoc = await UserModel.findOne({ id: targetUser?.id, guildID: guild.id }).exec();
     const userHistoryEmbed = createUserHistoryEmbed(userDoc, targetUser);
     await interaction.editReply({
       content: `Do you want to warn this user?`,
@@ -47,22 +51,22 @@ export const interactionCommand: InteractionCommand = {
     const response = await message.awaitMessageComponentInteraction(filter, { time: 15000 });
     if (response.customID === 'warn') {
       interaction.editReply({ content: `Warning for ${targetUser}: ${reason}`, embeds: [], components: [] });
-      if (userDoc) {
-        // @ts-ignore
+      if (userDoc && typeof userDoc.warnings !== 'undefined') {
         userDoc.warnings += 1;
-        userDoc.save();
+        return userDoc.save();
       } else {
         const newUserData: UserSchema = {
           username: targetUser?.username,
           id: targetUser?.id,
           tag: targetUser?.tag,
           warnings: 1,
+          guildID: guild.id,
         };
         const newUserDoc = new UserModel(newUserData);
-        newUserDoc.save();
+        return newUserDoc.save();
       }
     } else {
-      interaction.deleteReply();
+      return interaction.deleteReply();
     }
   },
 };

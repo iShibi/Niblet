@@ -19,8 +19,9 @@ export async function logEditedMessage(oldMessage: Message, newMessage: Message)
     .setColor('PURPLE')
     .setAuthor(`${oldMessage.author.tag} (${oldMessage.author.id})`, oldMessage.author.displayAvatarURL())
     .setDescription(
-      `**Message Edited by ${oldMessage.author} in ${oldMessage.channel}:**\n\n**Before**: ${oldMessage.content}\n**After**: ${newMessage.content}`,
-    );
+      `**Message Edited by ${oldMessage.author} in ${oldMessage.channel}:**\n\n**Before:** ${oldMessage.content}\n**After:** ${newMessage.content}`,
+    )
+    .setTimestamp();
 
   return channel.send({ embeds: [logEmbed] });
 }
