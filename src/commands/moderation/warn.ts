@@ -1,6 +1,6 @@
 import { UserModel } from '../../schemas/User.js';
 import { MessageActionRow, MessageButton } from 'discord.js';
-import { createUserHistoryEmbed } from '../../utils/Utility.js';
+import { collectMessageComponentInteraction, createUserHistoryEmbed } from '../../utils/Utility.js';
 import type { User } from 'discord.js';
 import type { Message, MessageComponentInteraction } from 'discord.js';
 import type { InteractionCommand, UserSchema } from '../../interfaces/index';
@@ -46,10 +46,12 @@ export const interactionCommand: InteractionCommand = {
       components: [buttonRow],
     });
     const message = (await interaction.fetchReply()) as Message;
-    const filter = (i: MessageComponentInteraction) =>
-      ['warn', 'cancel_warn'].includes(i.customID) && i.user.id === author.id;
-    const response = await message.awaitMessageComponentInteraction(filter, { time: 15000 });
-    if (response.customID === 'warn') {
+    const filter = (collectedComponentInteraction: MessageComponentInteraction) =>
+      ['warn', 'cancel_warn'].includes(collectedComponentInteraction.customID) &&
+      collectedComponentInteraction.user.id === author.id;
+    const [response, error] = await collectMessageComponentInteraction(message, filter, 10000);
+    if (error) return interaction.editReply({ content: 'You took too much time', embeds: [], components: [] });
+    if (response && response.customID === 'warn') {
       interaction.editReply({ content: `Warning for ${targetUser}: ${reason}`, embeds: [], components: [] });
       if (userDoc && typeof userDoc.warnings !== 'undefined') {
         userDoc.warnings += 1;
