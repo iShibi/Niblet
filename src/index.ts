@@ -6,7 +6,7 @@ import type { Snowflake } from 'discord.js';
 import type { Event, GuildDocument, InteractionCommand } from './interfaces/index';
 
 const client = new Client({
-  intents: ['GUILDS', 'GUILD_MESSAGES'],
+  intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_MEMBERS'],
 });
 
 mongoose
@@ -29,9 +29,9 @@ const eventFiles: Array<string> = fs.readdirSync('./src/events').filter(file => 
 eventFiles.forEach(async file => {
   const event: Event = (await import(`./events/${file}`)).event;
   if (event.once) {
-    client.once(event.name, (...args: Array<string>) => event.execute(...args, client, interactionCommands));
+    client.once(event.name, (...args) => event.execute(...args, client, interactionCommands));
   } else {
-    client.on(event.name, (...args: Array<string>) => event.execute(...args, client, interactionCommands));
+    client.on(event.name, (...args) => event.execute(...args, client, interactionCommands));
   }
 });
 
