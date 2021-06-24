@@ -35,7 +35,7 @@
     "typescript": "^4.3.4"
   },
   "dependencies": {
-    "discord.js": "^13.0.0-dev.807ea2d3c197c7c6556bd1c894114932f6657d49",
+    "discord.js": "^13.0.0-dev.6d3d00b44577a70e840f0187d6894043677c5329",
     "mongoose": "^5.12.14"
   }
 }
