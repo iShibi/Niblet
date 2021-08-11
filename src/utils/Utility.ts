@@ -1,14 +1,13 @@
-import { guildDocs } from '../index.js';
-import { MessageEmbed } from 'discord.js';
-import { GuildModel } from '../schemas/index.js';
 import type { Message, MessageComponentInteraction, Snowflake, User } from 'discord.js';
-import type { GuildDocument, UserSchema } from '../interfaces/index';
+import { MessageEmbed } from 'discord.js';
+import { guildDocs, mongoClient } from '../index';
+import type { GuildDocument, UserDocument } from '../typings/index';
 
 /**
  * Creates an embed containing information about a user's history
  * @returns An embed containing history of the provided user
  */
-export function createUserHistoryEmbed(data: UserSchema | null, user: User): MessageEmbed {
+export function createUserHistoryEmbed(user: User, data?: UserDocument): MessageEmbed {
   const userHistoryEmbed = new MessageEmbed()
     .setAuthor(`${user.tag} (${user.id}) ${data ? '✔️' : '❌'}`, user.displayAvatarURL())
     .setColor('RED')
@@ -25,12 +24,12 @@ export function createUserHistoryEmbed(data: UserSchema | null, user: User): Mes
  * Gets a guild document if it is cached, else fetches it from database
  * @returns A guild document
  */
-export async function getGuildDoc(guildID: Snowflake, force?: boolean): Promise<GuildDocument | null> {
+export async function getGuildDoc(guildID: Snowflake, force?: boolean): Promise<GuildDocument | undefined> {
   if (!force) {
     const guildDoc = guildDocs.get(guildID);
     if (guildDoc) return guildDoc;
   }
-  const guildDoc = await GuildModel.findOne({ id: guildID }).exec();
+  const guildDoc = await mongoClient.db().collection<GuildDocument>('guilds').findOne({ id: guildID });
   return guildDoc;
 }
 
@@ -47,7 +46,7 @@ export async function collectMessageComponentInteraction(
   collectorTime?: number,
 ): Promise<[MessageComponentInteraction | null, Error | null]> {
   try {
-    const response = await message.awaitMessageComponentInteraction(filter, { time: collectorTime });
+    const response = await message.awaitMessageComponent({ filter, componentType: 'BUTTON', time: collectorTime });
     return [response, null];
   } catch (error) {
     return [null, error];

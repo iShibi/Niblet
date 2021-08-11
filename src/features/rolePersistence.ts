@@ -1,30 +1,29 @@
-import { UserModel } from '../schemas/index.js';
 import type { GuildMember } from 'discord.js';
-import type { UserSchema } from '../interfaces/User.js';
+import { mongoClient } from '../index';
+import { UserDocument } from '../typings';
 
 export async function storeMemberRoles(member: GuildMember): Promise<unknown> {
   const user = member.user;
   const guild = member.guild;
-  const userDoc = await UserModel.findOne({ id: user.id, guildID: guild.id }).exec();
-  const memberRoleIDs = member.roles.cache.map(role => role.id).filter(id => id !== guild.id);
-  if (userDoc) {
-    userDoc.roles = memberRoleIDs;
-    return userDoc.save();
-  } else {
-    const newUserData: UserSchema = {
-      username: user.username,
-      id: user.id,
-      tag: user.tag,
-      guildID: guild.id,
-      roles: memberRoleIDs,
-    };
-    const newUserDoc = new UserModel(newUserData);
-    return newUserDoc.save();
-  }
+  const membersRoleIds = member.roles.cache.map(role => role.id).filter(id => id !== guild.id);
+  const newUserData: UserDocument = {
+    username: user.username,
+    id: user.id,
+    tag: user.tag,
+    guildID: guild.id,
+    roles: membersRoleIds,
+  };
+  return await mongoClient
+    .db()
+    .collection<UserDocument>('users')
+    .findOneAndUpdate({ id: user.id, guildID: guild.id }, { $set: newUserData }, { upsert: true });
 }
 
 export async function addMemberRoles(member: GuildMember): Promise<unknown> {
-  const userDoc = await UserModel.findOne({ id: member.id, guildID: member.guild.id }).exec();
+  const userDoc = await mongoClient
+    .db()
+    .collection<UserDocument>('users')
+    .findOne({ id: member.id, guildID: member.guild.id });
   if (!userDoc || typeof userDoc.roles === 'undefined') return;
   return member.roles.add(userDoc.roles, 'Roles Persistence');
 }

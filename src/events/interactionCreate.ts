@@ -1,8 +1,8 @@
 import type { Collection, Interaction } from 'discord.js';
-import type { Event, InteractionCommand } from '../interfaces/index';
+import type { Event, InteractionCommand } from '../typings/index';
 
 export const event: Event = {
-  name: 'interaction',
+  name: 'interactionCreate',
   once: false,
   async execute(interaction: Interaction, _, interactionCommands: Collection<string, InteractionCommand>) {
     if (interaction.isCommand()) {

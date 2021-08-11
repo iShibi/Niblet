@@ -1,5 +1,5 @@
 import { MessageEmbed } from 'discord.js';
-import { getGuildDoc } from '../utils/Utility.js';
+import { getGuildDoc } from '../utils/Utility';
 import type { GuildMember } from 'discord.js';
 
 export async function logMember(member: GuildMember, logType: MemberLogType): Promise<unknown> {

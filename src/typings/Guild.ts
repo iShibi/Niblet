@@ -1,11 +1,8 @@
-import mongoose from 'mongoose';
 import type { Snowflake } from 'discord.js';
 
-export interface GuildSchema {
+export interface GuildDocument {
   name: string;
   id: Snowflake;
   memberLogsChannelID: Snowflake | null;
   messageLogsChannelID: Snowflake | null;
 }
-
-export type GuildDocument = GuildSchema & mongoose.Document;

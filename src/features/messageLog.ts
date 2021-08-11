@@ -1,5 +1,5 @@
 import { MessageEmbed } from 'discord.js';
-import { getGuildDoc } from '../utils/Utility.js';
+import { getGuildDoc } from '../utils/Utility';
 import type { Message } from 'discord.js';
 
 export async function logEditedMessage(oldMessage: Message, newMessage: Message): Promise<unknown> {

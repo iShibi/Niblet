@@ -1,7 +1,6 @@
-import mongoose from 'mongoose';
 import type { Snowflake } from 'discord.js';
 
-export interface UserSchema {
+export interface UserDocument {
   username: string;
   id: Snowflake;
   tag: string;
@@ -14,5 +13,3 @@ export interface UserSchema {
   bans?: number;
   roles?: Array<string>;
 }
-
-export type UserDocument = UserSchema & mongoose.Document;

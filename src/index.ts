@@ -1,18 +1,22 @@
-import fs from 'fs';
-import mongoose from 'mongoose';
-import { Client, Collection } from 'discord.js';
-import { BOT_TOKEN, NIBLET_ATLAS_URI } from './config.js';
 import type { Snowflake } from 'discord.js';
-import type { Event, GuildDocument, InteractionCommand } from './interfaces/index';
+import { Client, Collection } from 'discord.js';
+import fs from 'fs';
+import { MongoClient } from 'mongodb';
+import { NIBLET_ATLAS_URI, NIBLET_BOT_TOKEN } from './config';
+import type { Event, GuildDocument, InteractionCommand } from './typings/index';
+
+export const mongoClient = new MongoClient(NIBLET_ATLAS_URI);
+
+try {
+  await mongoClient.connect();
+  console.log('Connected to MongoDB atlas');
+} catch (error: unknown) {
+  console.log('Error while connecting to MongoDB atlas:\n', error);
+}
 
 const client = new Client({
   intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_MEMBERS'],
 });
-
-mongoose
-  .connect(NIBLET_ATLAS_URI as string, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Connected to MongoDB Atlas'))
-  .catch(err => console.log('There was an error:\n', err));
 
 const interactionCommands = new Collection<string, InteractionCommand>();
 
@@ -37,4 +41,4 @@ eventFiles.forEach(async file => {
 
 export const guildDocs = new Collection<Snowflake, GuildDocument>();
 
-client.login(BOT_TOKEN);
+client.login(NIBLET_BOT_TOKEN);

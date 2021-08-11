@@ -1,4 +1,4 @@
-import type { InteractionCommand } from '../../interfaces/index';
+import type { InteractionCommand } from '../../typings/index';
 
 export const interactionCommand: InteractionCommand = {
   data: {
@@ -7,7 +7,6 @@ export const interactionCommand: InteractionCommand = {
   },
 
   async handle(interaction) {
-    await interaction.defer({ ephemeral: true });
-    interaction.editReply('Pong!');
+    return interaction.reply({ ephemeral: true, content: 'Pong!' });
   },
 };

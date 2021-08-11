@@ -31,4 +31,6 @@
     },
     "**/*.js.map": true
   },
+  "explorer.compactFolders": false,
+  "files.insertFinalNewline": true
 }

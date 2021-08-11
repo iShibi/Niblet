@@ -1,6 +1,6 @@
-import { logDeletedMessage } from '../features/messageLog.js';
+import { logDeletedMessage } from '../features/messageLog';
 import type { Message } from 'discord.js';
-import type { Event } from '../interfaces/index.js';
+import type { Event } from '../typings/index';
 
 export const event: Event = {
   name: 'messageDelete',

@@ -1,7 +1,6 @@
-import { guildDocs } from '../../index.js';
-import { GuildModel } from '../../schemas/index.js';
 import type { Snowflake } from 'discord.js';
-import type { GuildSchema, InteractionCommand } from '../../interfaces/index';
+import { guildDocs, mongoClient } from '../../index';
+import type { GuildDocument, InteractionCommand } from '../../typings/index';
 
 export const interactionCommand: InteractionCommand = {
   data: {
@@ -24,7 +23,7 @@ export const interactionCommand: InteractionCommand = {
   },
 
   async handle(interaction) {
-    await interaction.defer();
+    await interaction.deferReply();
     const guild = interaction.guild;
     if (!guild) {
       return interaction.editReply('This command is only valid in a guild');
@@ -33,25 +32,22 @@ export const interactionCommand: InteractionCommand = {
     const memberLogsChannelID = interaction.options.get('member_logs_channel')?.value as Snowflake;
     const messageLogsChannelID = interaction.options.get('message_logs_channel')?.value as Snowflake;
 
-    const guildDoc = await GuildModel.findOne({ id: guild.id }).exec();
+    const guildDataToSave: GuildDocument = {
+      id: guild.id,
+      name: guild.name,
+      memberLogsChannelID,
+      messageLogsChannelID,
+    };
 
-    if (guildDoc) {
-      guildDoc.memberLogsChannelID = memberLogsChannelID;
-      guildDoc.messageLogsChannelID = messageLogsChannelID;
-      const updatedGuildDoc = await guildDoc.save();
-      guildDocs.set(guild.id, updatedGuildDoc);
-      return interaction.editReply('Updated guild data in the database');
-    } else {
-      const newGuildData: GuildSchema = {
-        id: guild.id,
-        name: guild.name,
-        memberLogsChannelID,
-        messageLogsChannelID,
-      };
-      const newGuildDoc = new GuildModel(newGuildData);
-      const newSavedGuildDoc = await newGuildDoc.save();
-      guildDocs.set(guild.id, newSavedGuildDoc);
-      return interaction.editReply('Added guild data to the database');
-    }
+    const { value: savedGuildDoc } = await mongoClient
+      .db()
+      .collection<GuildDocument>('guilds')
+      .findOneAndUpdate({ id: guild.id }, { $set: guildDataToSave }, { upsert: true, returnDocument: 'after' });
+
+    if (!savedGuildDoc) return interaction.reply('Something went wrong');
+
+    guildDocs.set(savedGuildDoc.id, savedGuildDoc);
+
+    return interaction.editReply('Added guild data to the database');
   },
 };

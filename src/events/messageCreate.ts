@@ -1,8 +1,8 @@
 import type { Collection, Message } from 'discord.js';
-import type { Event, InteractionCommand } from '../interfaces/index';
+import type { Event, InteractionCommand } from '../typings/index';
 
 export const event: Event = {
-  name: 'message',
+  name: 'messageCreate',
   once: false,
   async execute(message: Message, _, interactionCommands: Collection<string, InteractionCommand>): Promise<void> {
     if (message.author.bot) return;
