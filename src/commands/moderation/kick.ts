@@ -73,7 +73,10 @@ export const interactionCommand: InteractionCommand = {
           kicks: 1,
           guildID: guild.id,
         };
-        return await mongoClient.db().collection<UserDocument>('users').insertOne(newUserData);
+        return await mongoClient
+          .db()
+          .collection<UserDocument>('users')
+          .findOneAndUpdate({ id: targetUser.id, guildID: guild.id }, { $set: newUserData }, { upsert: true });
       }
     } else {
       interaction.deleteReply();
