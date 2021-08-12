@@ -1,5 +1,4 @@
 import type { Snowflake } from 'discord.js';
-import { guildDocs, mongoClient } from '../../index';
 import type { GuildDocument, InteractionCommand } from '../../typings/index';
 
 export const interactionCommand: InteractionCommand = {
@@ -39,14 +38,13 @@ export const interactionCommand: InteractionCommand = {
       messageLogsChannelID,
     };
 
-    const { value: savedGuildDoc } = await mongoClient
-      .db()
+    const savedGuildDoc = await interaction.client.mongoDb
       .collection<GuildDocument>('guilds')
       .findOneAndUpdate({ id: guild.id }, { $set: guildDataToSave }, { upsert: true, returnDocument: 'after' });
 
-    if (!savedGuildDoc) return interaction.reply('Something went wrong');
+    if (!savedGuildDoc.value) return interaction.reply('Something went wrong');
 
-    guildDocs.set(savedGuildDoc.id, savedGuildDoc);
+    interaction.client.guildDocs.set(savedGuildDoc.value.id, savedGuildDoc.value);
 
     return interaction.editReply('Added guild data to the database');
   },

@@ -1,11 +1,11 @@
-import { MessageEmbed } from 'discord.js';
-import { getGuildDoc } from '../utils/Utility';
 import type { GuildMember } from 'discord.js';
+import { MessageEmbed } from 'discord.js';
+import { fetchGuildDoc } from '../utils/Utility';
 
 export async function logMember(member: GuildMember, logType: MemberLogType): Promise<unknown> {
   const guild = member.guild;
   if (!guild) return;
-  const guildDoc = await getGuildDoc(guild.id);
+  const guildDoc = await fetchGuildDoc(guild.id, guild.client);
   if (!guildDoc) return;
   const memberLogsChannelID = guildDoc.memberLogsChannelID;
   if (!memberLogsChannelID) return;

@@ -1,5 +1,5 @@
 import type { Client } from 'discord.js';
-import type { Event } from '../typings/index';
+import type { Event } from '../typings';
 
 export const event: Event = {
   name: 'ready',

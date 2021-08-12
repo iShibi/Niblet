@@ -1,7 +1,32 @@
-import type { Message, MessageComponentInteraction, Snowflake, User } from 'discord.js';
-import { MessageEmbed } from 'discord.js';
-import { guildDocs, mongoClient } from '../index';
-import type { GuildDocument, UserDocument } from '../typings/index';
+import { Client, Collection, Message, MessageComponentInteraction, MessageEmbed, Snowflake, User } from 'discord.js';
+import fs from 'fs';
+import { MongoClient } from 'mongodb';
+import type { Event, GuildDocument, InteractionCommand, UserDocument } from '../typings';
+
+/**
+ * Sets the bot up by loading commands, registering events, and initializing extended client properties
+ * @param client The instance of {@link Client} in use
+ */
+export async function setupBot(client: Client): Promise<void> {
+  loadCommands(client);
+  registerEvents(client);
+  client.guildDocs = new Collection();
+}
+
+/**
+ * Connects the bot to a mongodb atlas database
+ * @param uri The uri of the databse to connect to
+ * @param client client The instance of {@link Client} in use
+ */
+export async function connectToMongodb(uri: string, client: Client): Promise<void> {
+  try {
+    const databaseName = /\w\/([^?]*)/g.exec(uri)?.[1];
+    client.mongoDb = (await MongoClient.connect(uri)).db(databaseName);
+    console.log('Connected to MongoDB atlas');
+  } catch (error: unknown) {
+    console.log('Error while connecting to MongoDB atlas:\n', error);
+  }
+}
 
 /**
  * Creates an embed containing information about a user's history
@@ -21,15 +46,19 @@ export function createUserHistoryEmbed(user: User, data?: UserDocument): Message
 }
 
 /**
- * Gets a guild document if it is cached, else fetches it from database
+ * Fetches document of a guild from database or from cache if present
  * @returns A guild document
  */
-export async function getGuildDoc(guildID: Snowflake, force?: boolean): Promise<GuildDocument | undefined> {
+export async function fetchGuildDoc(
+  guildID: Snowflake,
+  client: Client,
+  force?: boolean,
+): Promise<GuildDocument | undefined> {
   if (!force) {
-    const guildDoc = guildDocs.get(guildID);
+    const guildDoc = client.guildDocs.get(guildID);
     if (guildDoc) return guildDoc;
   }
-  const guildDoc = await mongoClient.db().collection<GuildDocument>('guilds').findOne({ id: guildID });
+  const guildDoc = await client.mongoDb.collection<GuildDocument>('guilds').findOne({ id: guildID });
   return guildDoc;
 }
 
@@ -50,5 +79,37 @@ export async function collectMessageComponentInteraction(
     return [response, null];
   } catch (error) {
     return [null, error];
+  }
+}
+
+/**
+ * Loads all the interaction commands from commands folder into the memory
+ * @param client The instance of {@link Client} in use
+ */
+export async function loadCommands(client: Client): Promise<void> {
+  client.commands = new Collection();
+  const commandFolders = fs.readdirSync('./src/commands');
+  for (const folder of commandFolders) {
+    const commandFiles = fs.readdirSync(`./src/commands/${folder}`).filter(file => file.endsWith('.js'));
+    for (const file of commandFiles) {
+      const command: InteractionCommand = (await import(`../commands/${folder}/${file}`)).interactionCommand;
+      client.commands.set(command.data.name, command);
+    }
+  }
+}
+
+/**
+ * Registers all the events in the events folder
+ * @param client The instance of {@link Client} in use
+ */
+export async function registerEvents(client: Client): Promise<void> {
+  const eventFiles = fs.readdirSync('./src/events').filter(file => file.endsWith('.js'));
+  for (const file of eventFiles) {
+    const event: Event = (await import(`../events/${file}`)).event;
+    if (event.once) {
+      client.once(event.name, (...args) => event.execute(...args, client));
+    } else {
+      client.on(event.name, (...args) => event.execute(...args, client));
+    }
   }
 }

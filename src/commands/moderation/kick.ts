@@ -1,6 +1,5 @@
 import type { Message, MessageComponentInteraction, User } from 'discord.js';
 import { MessageActionRow, MessageButton } from 'discord.js';
-import { mongoClient } from '../../index';
 import { InteractionCommand, UserDocument } from '../../typings/index';
 import { collectMessageComponentInteraction, createUserHistoryEmbed } from '../../utils/Utility';
 
@@ -37,8 +36,7 @@ export const interactionCommand: InteractionCommand = {
       new MessageButton().setCustomId('kick').setLabel('Kick').setStyle('DANGER'),
       new MessageButton().setCustomId('cancel_kick').setLabel('Cancel').setStyle('SECONDARY'),
     );
-    const userDoc = await mongoClient
-      .db()
+    const userDoc = await interaction.client.mongoDb
       .collection<UserDocument>('users')
       .findOne({ id: targetUser.id, guildID: guild.id });
     const userHistoryEmbed = createUserHistoryEmbed(targetUser, userDoc);
@@ -61,8 +59,7 @@ export const interactionCommand: InteractionCommand = {
       const kickedMember = await guild.members.kick(targetUser, `Kicked by ${author.tag} | ${reason}`);
       interaction.editReply({ content: `Successfully Kicked ${kickedMember}`, embeds: [], components: [] });
       if (userDoc && typeof userDoc.kicks !== 'undefined') {
-        return await mongoClient
-          .db()
+        return await interaction.client.mongoDb
           .collection<UserDocument>('users')
           .updateOne({ id: targetUser.id, guildID: guild.id }, { $inc: { kicks: 1 } });
       } else {
@@ -73,8 +70,7 @@ export const interactionCommand: InteractionCommand = {
           kicks: 1,
           guildID: guild.id,
         };
-        return await mongoClient
-          .db()
+        return await interaction.client.mongoDb
           .collection<UserDocument>('users')
           .findOneAndUpdate({ id: targetUser.id, guildID: guild.id }, { $set: newUserData }, { upsert: true });
       }

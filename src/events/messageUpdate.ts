@@ -1,6 +1,6 @@
-import { logEditedMessage } from '../features/messageLog';
 import type { Message } from 'discord.js';
-import type { Event } from '../typings/index';
+import { logEditedMessage } from '../features/messageLog';
+import type { Event } from '../typings';
 
 export const event: Event = {
   name: 'messageUpdate',

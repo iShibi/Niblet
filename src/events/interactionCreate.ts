@@ -1,13 +1,13 @@
-import type { Collection, Interaction } from 'discord.js';
-import type { Event, InteractionCommand } from '../typings/index';
+import type { Client, Interaction } from 'discord.js';
+import type { Event } from '../typings';
 
 export const event: Event = {
   name: 'interactionCreate',
   once: false,
-  async execute(interaction: Interaction, _, interactionCommands: Collection<string, InteractionCommand>) {
+  async execute(interaction: Interaction, client: Client) {
     if (interaction.isCommand()) {
       try {
-        interactionCommands.get(interaction.commandName)?.handle(interaction);
+        client.commands.get(interaction.commandName)?.handle(interaction);
       } catch (error) {
         console.error(error);
       }

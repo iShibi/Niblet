@@ -1,11 +1,11 @@
-import { MessageEmbed } from 'discord.js';
-import { getGuildDoc } from '../utils/Utility';
 import type { Message } from 'discord.js';
+import { MessageEmbed } from 'discord.js';
+import { fetchGuildDoc } from '../utils/Utility';
 
 export async function logEditedMessage(oldMessage: Message, newMessage: Message): Promise<unknown> {
   const guild = oldMessage.guild ?? newMessage.guild;
   if (!guild) return;
-  const guildDoc = await getGuildDoc(guild.id);
+  const guildDoc = await fetchGuildDoc(guild.id, guild.client);
   if (!guildDoc) return;
   const messageLogsChannelId = guildDoc.messageLogsChannelID;
   if (!messageLogsChannelId) return;
@@ -29,7 +29,7 @@ export async function logEditedMessage(oldMessage: Message, newMessage: Message)
 export async function logDeletedMessage(message: Message): Promise<unknown> {
   const guild = message.guild;
   if (!guild) return;
-  const guildDoc = await getGuildDoc(guild.id);
+  const guildDoc = await fetchGuildDoc(guild.id, guild.client);
   if (!guildDoc) return;
   const messageLogsChannelId = guildDoc.messageLogsChannelID;
   if (!messageLogsChannelId) return;

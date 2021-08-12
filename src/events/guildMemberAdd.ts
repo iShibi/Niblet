@@ -1,7 +1,7 @@
+import type { GuildMember } from 'discord.js';
 import { logMember } from '../features/memberLog';
 import { addMemberRoles } from '../features/rolePersistence';
-import type { GuildMember } from 'discord.js';
-import type { Event } from '../typings/index';
+import type { Event } from '../typings';
 
 export const event: Event = {
   name: 'guildMemberAdd',

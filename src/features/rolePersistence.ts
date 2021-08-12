@@ -1,5 +1,4 @@
 import type { GuildMember } from 'discord.js';
-import { mongoClient } from '../index';
 import { UserDocument } from '../typings';
 
 export async function storeMemberRoles(member: GuildMember): Promise<unknown> {
@@ -13,15 +12,13 @@ export async function storeMemberRoles(member: GuildMember): Promise<unknown> {
     guildID: guild.id,
     roles: membersRoleIds,
   };
-  return await mongoClient
-    .db()
+  return await member.client.mongoDb
     .collection<UserDocument>('users')
     .findOneAndUpdate({ id: user.id, guildID: guild.id }, { $set: newUserData }, { upsert: true });
 }
 
 export async function addMemberRoles(member: GuildMember): Promise<unknown> {
-  const userDoc = await mongoClient
-    .db()
+  const userDoc = await member.client.mongoDb
     .collection<UserDocument>('users')
     .findOne({ id: member.id, guildID: member.guild.id });
   if (!userDoc || typeof userDoc.roles === 'undefined') return;
