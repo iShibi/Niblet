@@ -1,12 +1,12 @@
-import type { InteractionCommand } from '../../typings/index';
+import type { InteractionCommand } from '../../typings';
 
 export const interactionCommand: InteractionCommand = {
   data: {
     name: 'ping',
-    description: 'Checks whether or not the bot is online',
+    description: 'Make the bot say Pong!',
   },
 
   async handle(interaction) {
-    return interaction.reply({ ephemeral: true, content: 'Pong!' });
+    interaction.reply({ ephemeral: true, content: 'Pong!' });
   },
 };

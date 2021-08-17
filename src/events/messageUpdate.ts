@@ -1,5 +1,5 @@
 import type { Message } from 'discord.js';
-import { logEditedMessage } from '../features/messageLog';
+import { logEditedMessage } from '../features/messageLogging';
 import type { Event } from '../typings';
 
 export const event: Event = {
