@@ -1,8 +1,18 @@
-import type { Snowflake } from 'discord.js';
+import type { ApplicationCommandPermissionData, Snowflake } from 'discord.js';
 
 export interface GuildDocument {
   name: string;
+
+  /**
+   * The id of the guild
+   */
   id: Snowflake;
-  memberLogsChannelID: Snowflake | null;
-  messageLogsChannelID: Snowflake | null;
+  memberLogsChannelId?: Snowflake;
+  messageLogsChannelId?: Snowflake;
+  slashCommands?: Array<GuildDocumentSlashCommands>;
+}
+
+export interface GuildDocumentSlashCommands {
+  name: string;
+  permissions: Array<ApplicationCommandPermissionData>;
 }

@@ -1,12 +1,14 @@
 import { Client } from 'discord.js';
+import { connectToMongodb, loadCommands, registerEvents } from './utils/Utility';
 import { NIBLET_ATLAS_URI, NIBLET_BOT_TOKEN } from './config';
-import { connectToMongodb, setupBot } from './utils/Utility';
 
 const client = new Client({
   intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_MEMBERS'],
 });
 
-await setupBot(client);
+await loadCommands(client);
+
+await registerEvents(client);
 
 await connectToMongodb(NIBLET_ATLAS_URI, client);
 

@@ -1,17 +1,19 @@
-import { Client, Collection, Message, MessageComponentInteraction, MessageEmbed, Snowflake, User } from 'discord.js';
 import fs from 'fs';
 import { MongoClient } from 'mongodb';
+import {
+  ApplicationCommand,
+  ApplicationCommandPermissionData,
+  Client,
+  Collection,
+  Guild,
+  GuildApplicationCommandPermissionData,
+  Message,
+  MessageComponentInteraction,
+  MessageEmbed,
+  Snowflake,
+  User,
+} from 'discord.js';
 import type { Event, GuildDocument, InteractionCommand, UserDocument } from '../typings';
-
-/**
- * Sets the bot up by loading commands, registering events, and initializing extended client properties
- * @param client The instance of {@link Client} in use
- */
-export async function setupBot(client: Client): Promise<void> {
-  loadCommands(client);
-  registerEvents(client);
-  client.guildDocs = new Collection();
-}
 
 /**
  * Connects the bot to a mongodb atlas database
@@ -46,23 +48,6 @@ export function createUserHistoryEmbed(user: User, data?: UserDocument): Message
 }
 
 /**
- * Fetches document of a guild from database or from cache if present
- * @returns A guild document
- */
-export async function fetchGuildDoc(
-  guildID: Snowflake,
-  client: Client,
-  force?: boolean,
-): Promise<GuildDocument | undefined> {
-  if (!force) {
-    const guildDoc = client.guildDocs.get(guildID);
-    if (guildDoc) return guildDoc;
-  }
-  const guildDoc = await client.mongoDb.collection<GuildDocument>('guilds').findOne({ id: guildID });
-  return guildDoc;
-}
-
-/**
  * A function that abstracts try/catch block for component interaction collector into a monad
  * @param message Message to create component interaction collector on
  * @param filter The function for filtering component interactions
@@ -73,7 +58,7 @@ export async function collectMessageComponentInteraction(
   message: Message,
   filter: (collectedComponentInteraction: MessageComponentInteraction) => boolean,
   collectorTime?: number,
-): Promise<[MessageComponentInteraction | null, Error | null]> {
+): Promise<[MessageComponentInteraction | null, unknown | null]> {
   try {
     const response = await message.awaitMessageComponent({ filter, componentType: 'BUTTON', time: collectorTime });
     return [response, null];
@@ -112,4 +97,50 @@ export async function registerEvents(client: Client): Promise<void> {
       client.on(event.name, (...args) => event.execute(...args, client));
     }
   }
+}
+
+/**
+ * Deploys slash commands in a guild.
+ * @param guild The guild to deploy slash commands in
+ * @returns A {@link Collection} of {@link ApplicationCommand} objects as a `Promise`
+ */
+export async function deployGuildSlashCommads(guild: Guild): Promise<Collection<Snowflake, ApplicationCommand>> {
+  const client = guild.client;
+  const commandData = client.commands.map(command => command.data);
+  const createdSlashCommands = await guild.commands.set(commandData);
+  const fullPermissions: Array<GuildApplicationCommandPermissionData> = [];
+  for (const [id, slashCmd] of createdSlashCommands) {
+    const cmd = client.commands.find(cmd => cmd.data.name === slashCmd.name);
+    if (!cmd) continue;
+    fullPermissions.push({
+      id: id,
+      permissions: await buildPermissionData(guild, slashCmd.name),
+    });
+  }
+  await guild.commands.permissions.set({ fullPermissions });
+  return createdSlashCommands;
+}
+
+export async function buildPermissionData(
+  guild: Guild,
+  cmdName: string,
+): Promise<Array<ApplicationCommandPermissionData>> {
+  const data: Array<ApplicationCommandPermissionData> = [
+    {
+      id: guild.ownerId,
+      type: 'USER',
+      permission: true,
+    },
+  ];
+  const guildDoc = await guild.client.mongoDb.collection<GuildDocument>('guilds').findOne({ id: guild.id });
+  const slashCmdPermissions = guildDoc?.slashCommands?.find(cmd => cmd.name === cmdName)?.permissions;
+  if (!slashCmdPermissions) return data;
+  for (const perm of slashCmdPermissions) {
+    data.push({
+      id: perm.id,
+      type: perm.type,
+      permission: perm.permission,
+    });
+  }
+  return data;
 }

@@ -1,5 +1,5 @@
 import type { GuildMember } from 'discord.js';
-import { UserDocument } from '../typings';
+import type { UserDocument } from '../typings';
 
 export async function storeMemberRoles(member: GuildMember): Promise<unknown> {
   const user = member.user;
@@ -9,18 +9,18 @@ export async function storeMemberRoles(member: GuildMember): Promise<unknown> {
     username: user.username,
     id: user.id,
     tag: user.tag,
-    guildID: guild.id,
+    guildId: guild.id,
     roles: membersRoleIds,
   };
   return await member.client.mongoDb
     .collection<UserDocument>('users')
-    .findOneAndUpdate({ id: user.id, guildID: guild.id }, { $set: newUserData }, { upsert: true });
+    .findOneAndUpdate({ id: user.id, guildId: guild.id }, { $set: newUserData }, { upsert: true });
 }
 
 export async function addMemberRoles(member: GuildMember): Promise<unknown> {
   const userDoc = await member.client.mongoDb
     .collection<UserDocument>('users')
-    .findOne({ id: member.id, guildID: member.guild.id });
+    .findOne({ id: member.id, guildId: member.guild.id });
   if (!userDoc || typeof userDoc.roles === 'undefined') return;
   return member.roles.add(userDoc.roles, 'Roles Persistence');
 }

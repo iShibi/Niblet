@@ -1,5 +1,5 @@
-import type { Client, Interaction } from 'discord.js';
 import type { Event } from '../typings';
+import type { Client, Interaction } from 'discord.js';
 
 export const event: Event = {
   name: 'interactionCreate',

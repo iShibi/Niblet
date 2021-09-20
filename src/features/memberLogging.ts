@@ -1,16 +1,16 @@
-import type { GuildMember } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
-import { fetchGuildDoc } from '../utils/Utility';
+import type { GuildMember } from 'discord.js';
+import type { GuildDocument } from '../typings';
 
 export async function logMember(member: GuildMember, logType: MemberLogType): Promise<unknown> {
   const guild = member.guild;
   if (!guild) return;
-  const guildDoc = await fetchGuildDoc(guild.id, guild.client);
+  const guildDoc = await guild.client.mongoDb.collection<GuildDocument>('guilds').findOne({ id: guild.id });
   if (!guildDoc) return;
-  const memberLogsChannelID = guildDoc.memberLogsChannelID;
-  if (!memberLogsChannelID) return;
+  const memberLogsChannelId = guildDoc.memberLogsChannelId;
+  if (!memberLogsChannelId) return;
 
-  const channel = guild.channels.cache.find(channel => channel.id === memberLogsChannelID);
+  const channel = guild.channels.cache.find(channel => channel.id === memberLogsChannelId);
   if (!channel || !channel.isText()) return;
 
   let description = `• Profile: ${member}\n• Created: \`${member.user.createdAt.toUTCString()}\`\n• Joined: \`${member.joinedAt?.toUTCString()}\``;

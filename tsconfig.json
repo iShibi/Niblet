@@ -10,7 +10,7 @@
     "alwaysStrict": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "watch": true,
+    "useUnknownInCatchVariables": true
   },
   "include": [
     "src"

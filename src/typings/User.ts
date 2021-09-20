@@ -4,7 +4,7 @@ export interface UserDocument {
   username: string;
   id: Snowflake;
   tag: string;
-  guildID: Snowflake;
+  guildId: Snowflake;
   warnings?: number;
   restrictions?: number;
   mutes?: number;

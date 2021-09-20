@@ -1,13 +1,13 @@
-import type { Message } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
-import { fetchGuildDoc } from '../utils/Utility';
+import type { Message } from 'discord.js';
+import type { GuildDocument } from '../typings';
 
 export async function logEditedMessage(oldMessage: Message, newMessage: Message): Promise<unknown> {
   const guild = oldMessage.guild ?? newMessage.guild;
   if (!guild) return;
-  const guildDoc = await fetchGuildDoc(guild.id, guild.client);
+  const guildDoc = await guild.client.mongoDb.collection<GuildDocument>('guilds').findOne({ id: guild.id });
   if (!guildDoc) return;
-  const messageLogsChannelId = guildDoc.messageLogsChannelID;
+  const messageLogsChannelId = guildDoc.messageLogsChannelId;
   if (!messageLogsChannelId) return;
 
   if (oldMessage.channel.id === messageLogsChannelId) return;
@@ -29,9 +29,9 @@ export async function logEditedMessage(oldMessage: Message, newMessage: Message)
 export async function logDeletedMessage(message: Message): Promise<unknown> {
   const guild = message.guild;
   if (!guild) return;
-  const guildDoc = await fetchGuildDoc(guild.id, guild.client);
+  const guildDoc = await guild.client.mongoDb.collection<GuildDocument>('guilds').findOne({ id: guild.id });
   if (!guildDoc) return;
-  const messageLogsChannelId = guildDoc.messageLogsChannelID;
+  const messageLogsChannelId = guildDoc.messageLogsChannelId;
   if (!messageLogsChannelId) return;
 
   if (message.channel.id === messageLogsChannelId) return;

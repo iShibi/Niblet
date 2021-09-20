@@ -1,12 +1,13 @@
-import type { Message, MessageComponentInteraction, User } from 'discord.js';
 import { MessageActionRow, MessageButton } from 'discord.js';
-import { InteractionCommand, UserDocument } from '../../typings/index';
 import { collectMessageComponentInteraction, createUserHistoryEmbed } from '../../utils/Utility';
+import type { InteractionCommand, UserDocument } from '../../typings';
+import type { Message, MessageComponentInteraction, User } from 'discord.js';
 
 export const interactionCommand: InteractionCommand = {
   data: {
     name: 'kick',
     description: 'Kicks a member from the guild',
+    defaultPermission: false,
     options: [
       {
         name: 'member',
@@ -38,7 +39,7 @@ export const interactionCommand: InteractionCommand = {
     );
     const userDoc = await interaction.client.mongoDb
       .collection<UserDocument>('users')
-      .findOne({ id: targetUser.id, guildID: guild.id });
+      .findOne({ id: targetUser.id, guildId: guild.id });
     const userHistoryEmbed = createUserHistoryEmbed(targetUser, userDoc);
     await interaction.editReply({
       content: `Do you want to kick this user?`,
@@ -61,18 +62,18 @@ export const interactionCommand: InteractionCommand = {
       if (userDoc && typeof userDoc.kicks !== 'undefined') {
         return await interaction.client.mongoDb
           .collection<UserDocument>('users')
-          .updateOne({ id: targetUser.id, guildID: guild.id }, { $inc: { kicks: 1 } });
+          .updateOne({ id: targetUser.id, guildId: guild.id }, { $inc: { kicks: 1 } });
       } else {
         const newUserData: UserDocument = {
           username: targetUser?.username,
           id: targetUser?.id,
           tag: targetUser?.tag,
           kicks: 1,
-          guildID: guild.id,
+          guildId: guild.id,
         };
         return await interaction.client.mongoDb
           .collection<UserDocument>('users')
-          .findOneAndUpdate({ id: targetUser.id, guildID: guild.id }, { $set: newUserData }, { upsert: true });
+          .findOneAndUpdate({ id: targetUser.id, guildId: guild.id }, { $set: newUserData }, { upsert: true });
       }
     } else {
       interaction.deleteReply();
