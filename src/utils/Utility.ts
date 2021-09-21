@@ -13,7 +13,7 @@ import {
   Snowflake,
   User,
 } from 'discord.js';
-import type { Event, GuildDocument, InteractionCommand, UserDocument } from '../typings';
+import type { Event, GuildDocument, GuildDocumentSlashCommands, InteractionCommand, UserDocument } from '../typings';
 
 /**
  * Connects the bot to a mongodb atlas database
@@ -118,12 +118,13 @@ export async function deployGuildSlashCommads(guild: Guild): Promise<Collection<
     });
   }
   await guild.commands.permissions.set({ fullPermissions });
+  await syncGuildApplicationCommandData(guild, createdSlashCommands);
   return createdSlashCommands;
 }
 
 export async function buildPermissionData(
   guild: Guild,
-  cmdName: string,
+  commandName: string,
 ): Promise<Array<ApplicationCommandPermissionData>> {
   const data: Array<ApplicationCommandPermissionData> = [
     {
@@ -133,14 +134,45 @@ export async function buildPermissionData(
     },
   ];
   const guildDoc = await guild.client.mongoDb.collection<GuildDocument>('guilds').findOne({ id: guild.id });
-  const slashCmdPermissions = guildDoc?.slashCommands?.find(cmd => cmd.name === cmdName)?.permissions;
+  const slashCmdPermissions = guildDoc?.slashCommands?.find(cmd => cmd.name === commandName)?.permissions;
   if (!slashCmdPermissions) return data;
-  for (const perm of slashCmdPermissions) {
-    data.push({
-      id: perm.id,
-      type: perm.type,
-      permission: perm.permission,
-    });
+  for (const { id, type, permission } of slashCmdPermissions) {
+    data.push({ id, type, permission });
   }
   return data;
+}
+
+export async function syncGuildApplicationCommandData(
+  guild: Guild,
+  commands: Collection<string, ApplicationCommand>,
+): Promise<void> {
+  const guildDoc = await guild.client.mongoDb.collection<GuildDocument>('guilds').findOne({ id: guild.id });
+
+  const oldGuildApplicationCommandNames = guildDoc?.slashCommands.map(cmd => cmd.name);
+  const currentGuildApplicationCommandNames = commands.map(cmd => cmd.name);
+
+  const newGuildApplicationCommands = commands.filter(cmd => !oldGuildApplicationCommandNames?.includes(cmd.name));
+  const newGuildApplicationCommandDataArray = newGuildApplicationCommands.map(cmd => {
+    const newGuildApplicationCommandData: GuildDocumentSlashCommands = {
+      name: cmd.name,
+      permissions: [],
+    };
+    return newGuildApplicationCommandData;
+  });
+
+  const newGuildDoc = await guild.client.mongoDb
+    .collection<GuildDocument>('guilds')
+    .findOneAndUpdate(
+      { id: guild.id },
+      { $push: { slashCommands: { $each: newGuildApplicationCommandDataArray } } },
+      { returnDocument: 'after' },
+    );
+
+  const currentGuildApplicationCommandDataArrary = newGuildDoc.value?.slashCommands.filter(cmd =>
+    currentGuildApplicationCommandNames.includes(cmd.name),
+  );
+
+  await guild.client.mongoDb
+    .collection<GuildDocument>('guilds')
+    .findOneAndUpdate({ id: guild.id }, { $set: { slashCommands: currentGuildApplicationCommandDataArrary } });
 }

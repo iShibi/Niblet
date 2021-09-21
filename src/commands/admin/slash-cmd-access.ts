@@ -115,21 +115,13 @@ export const interactionCommand: InteractionCommand = {
         permissions: permissionData,
       });
 
-      const guildDataToSave: GuildDocument = {
-        id: guild.id,
-        name: guild.name,
-        slashCommands: [
-          {
-            name: slashCommand.name,
-            permissions: permissionData,
-          },
-        ],
-      };
-
-      // TODO: this will overwrite slashCommands array in database. Fix it
       await interaction.client.mongoDb
         .collection<GuildDocument>('guilds')
-        .findOneAndUpdate({ id: guild.id }, { $set: guildDataToSave }, { upsert: true, returnDocument: 'after' });
+        .findOneAndUpdate(
+          { id: guild.id },
+          { $push: { 'slashCommands.$[slashCommand].permissions': { $each: permissionData } } },
+          { arrayFilters: [{ 'slashCommand.name': slashCommand.name }], upsert: true },
+        );
 
       return interaction.editReply(
         `${action}ed the slash command \`${nameOfSlashCmdToConfigure}\` for \`${role.name}\` role`,
@@ -160,21 +152,13 @@ export const interactionCommand: InteractionCommand = {
         permissions: permissionData,
       });
 
-      const guildDataToSave: GuildDocument = {
-        id: guild.id,
-        name: guild.name,
-        slashCommands: [
-          {
-            name: slashCommand.name,
-            permissions: permissionData,
-          },
-        ],
-      };
-
-      // TODO: this will overwrite slashCommands array in database. Fix it
       await interaction.client.mongoDb
         .collection<GuildDocument>('guilds')
-        .findOneAndUpdate({ id: guild.id }, { $set: guildDataToSave }, { upsert: true, returnDocument: 'after' });
+        .findOneAndUpdate(
+          { id: guild.id },
+          { $push: { 'slashCommands.$[slashCommand].permissions': { $each: permissionData } } },
+          { arrayFilters: [{ 'slashCommand.name': slashCommand.name }], upsert: true },
+        );
 
       return interaction.editReply(
         `${action}ed the slash command \`${nameOfSlashCmdToConfigure}\` for user \`${user.username}\``,

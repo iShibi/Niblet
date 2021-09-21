@@ -29,16 +29,9 @@ export const interactionCommand: InteractionCommand = {
     const memberLogsChannelId = interaction.options.get('member_logs_channel')?.channel?.id;
     const messageLogsChannelId = interaction.options.get('message_logs_channel')?.channel?.id;
 
-    const guildDataToSave: GuildDocument = {
-      id: guild.id,
-      name: guild.name,
-      memberLogsChannelId,
-      messageLogsChannelId,
-    };
-
     await interaction.client.mongoDb
       .collection<GuildDocument>('guilds')
-      .findOneAndUpdate({ id: guild.id }, { $set: guildDataToSave }, { upsert: true });
+      .findOneAndUpdate({ id: guild.id }, { $set: { memberLogsChannelId, messageLogsChannelId } }, { upsert: true });
 
     return interaction.editReply('Added the provided guild data to the database');
   },
