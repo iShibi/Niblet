@@ -3,7 +3,7 @@ import type { GuildDocument, InteractionCommand } from '../../typings';
 
 export const interactionCommand: InteractionCommand = {
   data: {
-    name: 'slash-cmd-access',
+    name: 'cmd-access',
     description: 'Configure slash commands access',
     defaultPermission: false,
     options: [
@@ -35,7 +35,7 @@ export const interactionCommand: InteractionCommand = {
             required: true,
           },
           {
-            name: 'slash-cmd-name',
+            name: 'cmd-name',
             description: 'The slash command to lock or unlock for this role',
             type: 'STRING',
             required: true,
@@ -70,7 +70,7 @@ export const interactionCommand: InteractionCommand = {
             required: true,
           },
           {
-            name: 'slash-cmd-name',
+            name: 'cmd-name',
             description: 'The slash cmd to lock or unlock for this user',
             type: 'STRING',
             required: true,
@@ -93,7 +93,7 @@ export const interactionCommand: InteractionCommand = {
       const role = interaction.options.get('role', true).role;
       if (!role) return interaction.editReply('Provide a valid role to perform the action on.');
 
-      const nameOfSlashCmdToConfigure = interaction.options.get('slash-cmd-name', true).value;
+      const nameOfSlashCmdToConfigure = interaction.options.get('cmd-name', true).value;
       const slashCommand =
         guild.commands.cache.find(cmd => cmd.name === nameOfSlashCmdToConfigure) ??
         (await guild.commands.fetch()).find(cmd => cmd.name === nameOfSlashCmdToConfigure);
@@ -130,7 +130,7 @@ export const interactionCommand: InteractionCommand = {
       const user = interaction.options.get('user', true).user;
       if (!user) return interaction.editReply('Provide a valid user to perform the action on.');
 
-      const nameOfSlashCmdToConfigure = interaction.options.get('slash-cmd-name', true).value;
+      const nameOfSlashCmdToConfigure = interaction.options.get('cmd-name', true).value;
       const slashCommand =
         guild.commands.cache.find(cmd => cmd.name === nameOfSlashCmdToConfigure) ??
         (await guild.commands.fetch()).find(cmd => cmd.name === nameOfSlashCmdToConfigure);

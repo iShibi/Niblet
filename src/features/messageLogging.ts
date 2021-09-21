@@ -42,7 +42,8 @@ export async function logDeletedMessage(message: Message): Promise<unknown> {
   const logEmbed = new MessageEmbed()
     .setColor('RED')
     .setAuthor(`${message.author.tag} (${message.author.id})`, message.author.displayAvatarURL())
-    .setDescription(`**Message deleted by ${message.author} in ${message.channel}:**\n\n${message.content}`);
+    .setDescription(`**Message deleted by ${message.author} in ${message.channel}:**\n\n${message.content}`)
+    .setTimestamp();
 
   channel.send({ embeds: [logEmbed] });
 }

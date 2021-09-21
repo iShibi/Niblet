@@ -7,12 +7,12 @@ export const interactionCommand: InteractionCommand = {
     defaultPermission: false,
     options: [
       {
-        name: 'member_logs_channel',
+        name: 'member-logs-channel',
         type: 'CHANNEL',
         description: 'The channel to send the member logs in',
       },
       {
-        name: 'message_logs_channel',
+        name: 'message-logs-channel',
         type: 'CHANNEL',
         description: 'The channel to send the message logs in',
       },
@@ -26,8 +26,8 @@ export const interactionCommand: InteractionCommand = {
       return interaction.editReply('This command is only valid in a guild');
     }
 
-    const memberLogsChannelId = interaction.options.get('member_logs_channel')?.channel?.id;
-    const messageLogsChannelId = interaction.options.get('message_logs_channel')?.channel?.id;
+    const memberLogsChannelId = interaction.options.get('member-logs-channel')?.channel?.id;
+    const messageLogsChannelId = interaction.options.get('message-logs-channel')?.channel?.id;
 
     await interaction.client.mongoDb
       .collection<GuildDocument>('guilds')
