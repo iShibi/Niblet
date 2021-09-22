@@ -1,4 +1,4 @@
-import { deployGuildSlashCommads } from '../utils/Utility';
+import { deployGuildApplicationCommads } from '../utils/Utility';
 import type { Event } from '../typings';
 import type { Message } from 'discord.js';
 
@@ -13,8 +13,8 @@ export const event: Event = {
         message.reply('This command is only valid in a guild');
         return;
       }
-      const createdSlashCommands = await deployGuildSlashCommads(guild);
-      const count = createdSlashCommands?.size;
+      const createdApplicationCommands = await deployGuildApplicationCommads(guild);
+      const count = createdApplicationCommands?.size;
       if (count) message.channel.send(`Deployed \`${count}\` interaction ${count > 1 ? 'cmds' : 'cmd'}`);
       else message.channel.send(`Deployed nothing`);
     }

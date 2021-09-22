@@ -1,26 +1,15 @@
-import type { Event, GuildDocument, GuildDocumentSlashCommands } from '../typings';
+import { initGuildDatabase } from '../utils/Utility';
 import type { Guild } from 'discord.js';
+import type { Event, GuildDocument } from '../typings';
 
 export const event: Event = {
   name: 'guildCreate',
   once: false,
   async execute(guild: Guild) {
-    const guildDoc: GuildDocument = {
-      id: guild.id,
-      name: guild.name,
-      slashCommands: guild.client.commands.map(cmd => {
-        const slashCommandsData: GuildDocumentSlashCommands = {
-          name: cmd.data.name,
-          permissions: [],
-        };
-        return slashCommandsData;
-      }),
-    };
-
     const guildDocExist = await guild.client.mongoDb.collection<GuildDocument>('guilds').findOne({ id: guild.id });
 
     if (!guildDocExist) {
-      await guild.client.mongoDb.collection<GuildDocument>('guilds').insertOne(guildDoc);
+      await initGuildDatabase(guild);
     }
   },
 };

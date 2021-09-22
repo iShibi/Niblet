@@ -12,9 +12,9 @@ export interface GuildDocument {
   id: Snowflake;
 
   /**
-   * The details about slash commands that are available in the guild
+   * The details about commands that are available in the guild
    */
-  slashCommands: Array<GuildDocumentSlashCommands>;
+  applicationCommands: Array<ApplicationCommandDocument>;
 
   /**
    * The id of the channel where member logs should be sent
@@ -27,14 +27,14 @@ export interface GuildDocument {
   messageLogsChannelId?: Snowflake;
 }
 
-export interface GuildDocumentSlashCommands {
+export interface ApplicationCommandDocument {
   /**
-   * The name of the slash command
+   * The name of the application command
    */
   name: string;
 
   /**
-   * The permissions data of the slash command
+   * The permissions data of the application command
    */
   permissions: Array<ApplicationCommandPermissionData>;
 }

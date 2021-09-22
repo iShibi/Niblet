@@ -4,12 +4,12 @@ import type { GuildDocument, InteractionCommand } from '../../typings';
 export const interactionCommand: InteractionCommand = {
   data: {
     name: 'cmd-access',
-    description: 'Configure slash commands access',
+    description: 'Configure application commands access',
     defaultPermission: false,
     options: [
       {
         name: 'for-role',
-        description: 'Configure access to slash commands for a role',
+        description: 'Configure access to application commands for a role',
         type: 'SUB_COMMAND',
         options: [
           {
@@ -36,7 +36,7 @@ export const interactionCommand: InteractionCommand = {
           },
           {
             name: 'cmd-name',
-            description: 'The slash command to lock or unlock for this role',
+            description: 'The application command to lock or unlock for this role',
             type: 'STRING',
             required: true,
           },
@@ -44,7 +44,7 @@ export const interactionCommand: InteractionCommand = {
       },
       {
         name: 'for-user',
-        description: 'Configure access to slash commands for a user',
+        description: 'Configure access to application commands for a user',
         type: 'SUB_COMMAND',
         options: [
           {
@@ -71,7 +71,7 @@ export const interactionCommand: InteractionCommand = {
           },
           {
             name: 'cmd-name',
-            description: 'The slash cmd to lock or unlock for this user',
+            description: 'The application cmd to lock or unlock for this user',
             type: 'STRING',
             required: true,
           },
@@ -93,11 +93,11 @@ export const interactionCommand: InteractionCommand = {
       const role = interaction.options.get('role', true).role;
       if (!role) return interaction.editReply('Provide a valid role to perform the action on.');
 
-      const nameOfSlashCmdToConfigure = interaction.options.get('cmd-name', true).value;
-      const slashCommand =
-        guild.commands.cache.find(cmd => cmd.name === nameOfSlashCmdToConfigure) ??
-        (await guild.commands.fetch()).find(cmd => cmd.name === nameOfSlashCmdToConfigure);
-      if (!slashCommand) return interaction.editReply(`The slash cmd \`${nameOfSlashCmdToConfigure}\` does not exist.`);
+      const nameOfCommandToConfigure = interaction.options.get('cmd-name', true).value;
+      const command =
+        guild.commands.cache.find(cmd => cmd.name === nameOfCommandToConfigure) ??
+        (await guild.commands.fetch()).find(cmd => cmd.name === nameOfCommandToConfigure);
+      if (!command) return interaction.editReply(`The command \`${nameOfCommandToConfigure}\` does not exist.`);
 
       const action = interaction.options.get('action', true).value as 'lock' | 'unlock';
       if (!action) return interaction.editReply('Provide a valid action to perform on the role');
@@ -111,7 +111,7 @@ export const interactionCommand: InteractionCommand = {
       ];
 
       await interaction.guild.commands.permissions.add({
-        command: slashCommand,
+        command: command,
         permissions: permissionData,
       });
 
@@ -119,22 +119,20 @@ export const interactionCommand: InteractionCommand = {
         .collection<GuildDocument>('guilds')
         .findOneAndUpdate(
           { id: guild.id },
-          { $push: { 'slashCommands.$[slashCommand].permissions': { $each: permissionData } } },
-          { arrayFilters: [{ 'slashCommand.name': slashCommand.name }], upsert: true },
+          { $push: { 'applicationCommands.$[index].permissions': { $each: permissionData } } },
+          { arrayFilters: [{ 'index.name': command.name }], upsert: true },
         );
 
-      return interaction.editReply(
-        `${action}ed the slash command \`${nameOfSlashCmdToConfigure}\` for \`${role.name}\` role`,
-      );
+      return interaction.editReply(`${action}ed the command \`${nameOfCommandToConfigure}\` for \`${role.name}\` role`);
     } else if (subCommandName === 'for-user') {
       const user = interaction.options.get('user', true).user;
       if (!user) return interaction.editReply('Provide a valid user to perform the action on.');
 
-      const nameOfSlashCmdToConfigure = interaction.options.get('cmd-name', true).value;
-      const slashCommand =
-        guild.commands.cache.find(cmd => cmd.name === nameOfSlashCmdToConfigure) ??
-        (await guild.commands.fetch()).find(cmd => cmd.name === nameOfSlashCmdToConfigure);
-      if (!slashCommand) return interaction.editReply(`The slash cmd \`${nameOfSlashCmdToConfigure}\` does not exist.`);
+      const nameOfCommandToConfigure = interaction.options.get('cmd-name', true).value;
+      const command =
+        guild.commands.cache.find(cmd => cmd.name === nameOfCommandToConfigure) ??
+        (await guild.commands.fetch()).find(cmd => cmd.name === nameOfCommandToConfigure);
+      if (!command) return interaction.editReply(`The cmd \`${nameOfCommandToConfigure}\` does not exist.`);
 
       const action = interaction.options.get('action', true).value as 'lock' | 'unlock';
       if (!action) return interaction.editReply('Provide a valid action to perform on the user');
@@ -148,7 +146,7 @@ export const interactionCommand: InteractionCommand = {
       ];
 
       await interaction.guild.commands.permissions.add({
-        command: slashCommand,
+        command: command,
         permissions: permissionData,
       });
 
@@ -156,13 +154,11 @@ export const interactionCommand: InteractionCommand = {
         .collection<GuildDocument>('guilds')
         .findOneAndUpdate(
           { id: guild.id },
-          { $push: { 'slashCommands.$[slashCommand].permissions': { $each: permissionData } } },
-          { arrayFilters: [{ 'slashCommand.name': slashCommand.name }], upsert: true },
+          { $push: { 'applicationCommands.$[index].permissions': { $each: permissionData } } },
+          { arrayFilters: [{ 'index.name': command.name }], upsert: true },
         );
 
-      return interaction.editReply(
-        `${action}ed the slash command \`${nameOfSlashCmdToConfigure}\` for user \`${user.username}\``,
-      );
+      return interaction.editReply(`${action}ed the command \`${nameOfCommandToConfigure}\` for \`${user.username}\``);
     }
   },
 };
