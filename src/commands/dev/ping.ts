@@ -7,6 +7,7 @@ export const interactionCommand: InteractionCommand = {
   },
 
   async handle(interaction) {
+    if (!interaction.isCommand()) return;
     interaction.reply({ ephemeral: true, content: 'Pong!' });
   },
 };

@@ -1,4 +1,4 @@
-import type { ApplicationCommandData, CommandInteraction } from 'discord.js';
+import type { ApplicationCommandData, CommandInteraction, ContextMenuInteraction } from 'discord.js';
 
 export interface InteractionCommand {
   /**
@@ -9,5 +9,5 @@ export interface InteractionCommand {
   /**
    * The function to call when an interaction is recieved
    */
-  handle(interaction: CommandInteraction): Promise<unknown>;
+  handle(interaction: CommandInteraction | ContextMenuInteraction): Promise<unknown>;
 }

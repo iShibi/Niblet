@@ -81,6 +81,7 @@ export const interactionCommand: InteractionCommand = {
   },
 
   async handle(interaction) {
+    if (!interaction.isCommand()) return;
     await interaction.deferReply();
     const guild = interaction.guild;
     if (!guild) {

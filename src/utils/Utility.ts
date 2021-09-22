@@ -11,7 +11,6 @@ import {
   MessageComponentInteraction,
   MessageEmbed,
   Snowflake,
-  User,
 } from 'discord.js';
 import type { Event, GuildDocument, ApplicationCommandDocument, InteractionCommand, UserDocument } from '../typings';
 
@@ -31,17 +30,22 @@ export async function connectToMongodb(uri: string, client: Client): Promise<voi
 }
 
 /**
- * Creates an embed containing information about a user's history
- * @returns An embed containing history of the provided user
+ * Creates an embed containing information about a user's history in a given guild
+ * @param userId The id of the user whose history embed is to be created
+ * @param guild The guild to look into for the user's history
+ * @returns An embed containing history of the provided user in the given guild
  */
-export function createUserHistoryEmbed(user: User, data?: UserDocument): MessageEmbed {
+export async function createUserHistoryEmbed(userId: Snowflake, guild: Guild): Promise<MessageEmbed> {
+  const { client } = guild;
+  const user = await client.users.fetch(userId);
+  const userDoc = await client.mongoDb.collection<UserDocument>('users').findOne({ id: user.id, guildId: guild.id });
   const userHistoryEmbed = new MessageEmbed()
-    .setAuthor(`${user.tag} (${user.id}) ${data ? '✔️' : '❌'}`, user.displayAvatarURL())
+    .setAuthor(`${user.tag} (${user.id}) ${userDoc ? '✔️' : '❌'}`, user.displayAvatarURL())
     .setColor('RED')
     .setFooter(
       // eslint-disable-next-line
-      `warnings: ${data?.warnings ?? 0}, restrictions: ${data?.restrictions ?? 0}, mutes: ${data?.mutes ?? 0}, kicks: ${data?.kicks ?? 0
-      }, softbans: ${data?.softbans ?? 0}, bans: ${data?.bans ?? 0}`,
+      `warnings: ${userDoc?.warnings ?? 0}, restrictions: ${userDoc?.restrictions ?? 0}, mutes: ${userDoc?.mutes ?? 0}, kicks: ${userDoc?.kicks ?? 0
+      }, softbans: ${userDoc?.softbans ?? 0}, bans: ${userDoc?.bans ?? 0}`,
     );
 
   return userHistoryEmbed;

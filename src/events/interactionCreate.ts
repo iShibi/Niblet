@@ -5,7 +5,7 @@ export const event: Event = {
   name: 'interactionCreate',
   once: false,
   async execute(interaction: Interaction, client: Client) {
-    if (interaction.isCommand()) {
+    if (interaction.isCommand() || interaction.isContextMenu()) {
       try {
         client.commands.get(interaction.commandName)?.handle(interaction);
       } catch (error) {

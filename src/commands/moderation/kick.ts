@@ -25,6 +25,7 @@ export const interactionCommand: InteractionCommand = {
   },
 
   async handle(interaction) {
+    if (!interaction.isCommand()) return;
     await interaction.deferReply();
     const guild = interaction.guild;
     if (!guild) {
@@ -40,7 +41,7 @@ export const interactionCommand: InteractionCommand = {
     const userDoc = await interaction.client.mongoDb
       .collection<UserDocument>('users')
       .findOne({ id: targetUser.id, guildId: guild.id });
-    const userHistoryEmbed = createUserHistoryEmbed(targetUser, userDoc);
+    const userHistoryEmbed = await createUserHistoryEmbed(targetUser.id, guild);
     await interaction.editReply({
       content: `Do you want to kick this user?`,
       embeds: [userHistoryEmbed],
