@@ -5,20 +5,20 @@ import type { Message, MessageComponentInteraction } from 'discord.js';
 
 export const interactionCommand: InteractionCommand = {
   data: {
-    name: 'kick',
-    description: 'Kicks a member from the guild',
+    name: 'warn',
+    description: 'Warns a member of the guild',
     defaultPermission: false,
     options: [
       {
         name: 'member',
         type: 'USER',
-        description: 'The member to kick',
+        description: 'The member to warn',
         required: true,
       },
       {
         name: 'reason',
         type: 'STRING',
-        description: 'The reason for kicking this member',
+        description: 'The reason for warning this member',
         required: true,
       },
     ],
@@ -34,39 +34,38 @@ export const interactionCommand: InteractionCommand = {
 
     const { user: author } = interaction;
 
-    const userToKick = interaction.options.get('member')?.user;
-    if (!userToKick) return interaction.editReply({ content: 'Provide a valid user to kick' });
+    const userToWarn = interaction.options.get('member')?.user;
+    if (!userToWarn) return interaction.editReply({ content: 'Provide a valid user to warn' });
 
-    const reason = interaction.options.get('reason')?.value as string;
+    const reason = interaction.options.get('reason')?.value;
 
     const buttonRow = new MessageActionRow().addComponents(
-      new MessageButton().setCustomId('kick').setLabel('Kick').setStyle('DANGER'),
-      new MessageButton().setCustomId('cancel_kick').setLabel('Cancel').setStyle('SECONDARY'),
+      new MessageButton().setCustomId('warn').setLabel('Warn').setStyle('DANGER'),
+      new MessageButton().setCustomId('cancel_warn').setLabel('Cancel').setStyle('SECONDARY'),
     );
 
-    const userHistoryEmbed = await createUserHistoryEmbed(userToKick.id, guild);
+    const userHistoryEmbed = await createUserHistoryEmbed(userToWarn.id, guild);
 
     await interaction.editReply({
-      content: `Do you want to kick this user?`,
+      content: `Do you want to warn this user?`,
       embeds: [userHistoryEmbed],
       components: [buttonRow],
     });
 
     const filter = (i: MessageComponentInteraction) => {
       i.deferUpdate();
-      return ['kick', 'cancel_kick'].includes(i.customId) && i.user.id === author.id;
+      return ['warn', 'cancel_warn'].includes(i.customId) && i.user.id === author.id;
     };
 
     const [response, error] = await collectButtonInteraction(message, filter, 10000);
 
     if (error) return interaction.editReply({ content: 'You took too much time', embeds: [], components: [] });
 
-    if (response && response.customId === 'kick') {
-      await guild.members.kick(userToKick, reason);
-      interaction.editReply({ content: `Successfully Kicked ${userToKick}`, embeds: [], components: [] });
+    if (response && response.customId === 'warn') {
+      interaction.editReply({ content: `${userToWarn}: ${reason}`, embeds: [], components: [] });
       return await interaction.client.mongoDb
         .collection<UserDocument>('users')
-        .findOneAndUpdate({ id: userToKick.id, guildId: guild.id }, { $inc: { kicks: 1 } }, { upsert: true });
+        .findOneAndUpdate({ id: userToWarn.id, guildId: guild.id }, { $inc: { warnings: 1 } }, { upsert: true });
     } else {
       interaction.deleteReply();
     }

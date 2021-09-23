@@ -52,19 +52,19 @@ export async function createUserHistoryEmbed(userId: Snowflake, guild: Guild): P
 }
 
 /**
- * A function that abstracts try/catch block for component interaction collector into a monad
- * @param message Message to create component interaction collector on
+ * Collects a button interaction on a message that passes the given filter.
+ * @param message The message to create the collector on
  * @param filter The function for filtering component interactions
- * @param collectorTime The time for which the collector should be active
- * @returns An array containing collected item and error, only one of them can be non-null at a time
+ * @param collectorDuration The time for which the collector should be active
+ * @returns An array containing collected interaction and error, only one of them can be non-null at a time
  */
-export async function collectMessageComponentInteraction(
+export async function collectButtonInteraction(
   message: Message,
-  filter: (collectedComponentInteraction: MessageComponentInteraction) => boolean,
-  collectorTime?: number,
+  filter: (i: MessageComponentInteraction) => boolean,
+  collectorDuration?: number,
 ): Promise<[MessageComponentInteraction | null, unknown | null]> {
   try {
-    const response = await message.awaitMessageComponent({ filter, componentType: 'BUTTON', time: collectorTime });
+    const response = await message.awaitMessageComponent({ filter, componentType: 'BUTTON', time: collectorDuration });
     return [response, null];
   } catch (error) {
     return [null, error];
