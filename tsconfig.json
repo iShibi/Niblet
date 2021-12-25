@@ -1,16 +1,14 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
+    "strict": true,
     "target": "ESNext",
     "module": "ESNext",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
     "alwaysStrict": true,
+    "esModuleInterop": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "useUnknownInCatchVariables": true
+    "forceConsistentCasingInFileNames": true,
   },
   "include": [
     "src"

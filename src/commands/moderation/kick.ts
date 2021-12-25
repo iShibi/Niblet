@@ -1,6 +1,6 @@
 import { MessageActionRow, MessageButton } from 'discord.js';
 import { collectButtonInteraction, createUserHistoryEmbed } from '../../utils/Utility';
-import type { InteractionCommand, UserDocument } from '../../typings';
+import type { InteractionCommand } from '../../typings';
 import type { Message, MessageComponentInteraction } from 'discord.js';
 
 export const interactionCommand: InteractionCommand = {
@@ -64,9 +64,24 @@ export const interactionCommand: InteractionCommand = {
     if (response && response.customId === 'kick') {
       await guild.members.kick(userToKick, reason);
       interaction.editReply({ content: `Successfully Kicked ${userToKick}`, embeds: [], components: [] });
-      return await interaction.client.mongoDb
-        .collection<UserDocument>('users')
-        .findOneAndUpdate({ id: userToKick.id, guildId: guild.id }, { $inc: { kicks: 1 } }, { upsert: true });
+      await interaction.client.prisma.user.upsert({
+        where: {
+          id_guildId: {
+            id: userToKick.id,
+            guildId: guild.id,
+          },
+        },
+        update: {
+          kicks: {
+            increment: 1,
+          },
+        },
+        create: {
+          id: userToKick.id,
+          guildId: guild.id,
+          kicks: 1,
+        },
+      });
     } else {
       interaction.deleteReply();
     }

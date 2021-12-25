@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { MongoClient } from 'mongodb';
+import Prisma from '@prisma/client';
 import {
   ApplicationCommand,
   ApplicationCommandPermissionData,
@@ -12,17 +12,17 @@ import {
   MessageEmbed,
   Snowflake,
 } from 'discord.js';
-import type { Event, GuildDocument, ApplicationCommandDocument, InteractionCommand, UserDocument } from '../typings';
+import type { Event, InteractionCommand } from '../typings';
 
 /**
  * Connects the bot to a mongodb atlas database
- * @param uri The uri of the databse to connect to
  * @param client client The instance of {@link Client} in use
  */
-export async function connectToMongodb(uri: string, client: Client): Promise<void> {
+export async function connectToMongodb(client: Client): Promise<void> {
   try {
-    const databaseName = /\w\/([^?]*)/g.exec(uri)?.[1];
-    client.mongoDb = (await MongoClient.connect(uri)).db(databaseName);
+    const { PrismaClient } = Prisma;
+    client.prisma = new PrismaClient();
+    await client.prisma.$connect();
     console.log('Connected to MongoDB atlas');
   } catch (error: unknown) {
     console.log('Error while connecting to MongoDB atlas:\n', error);
@@ -38,7 +38,12 @@ export async function connectToMongodb(uri: string, client: Client): Promise<voi
 export async function createUserHistoryEmbed(userId: Snowflake, guild: Guild): Promise<MessageEmbed> {
   const { client } = guild;
   const user = await client.users.fetch(userId);
-  const userDoc = await client.mongoDb.collection<UserDocument>('users').findOne({ id: user.id, guildId: guild.id });
+  const userDoc = await client.prisma.user.findFirst({
+    where: {
+      id: user.id,
+      guildId: guild.id,
+    },
+  });
   const userHistoryEmbed = new MessageEmbed()
     .setAuthor(`${user.tag} (${user.id}) ${userDoc ? '✔️' : '❌'}`, user.displayAvatarURL())
     .setColor('RED')
@@ -111,24 +116,21 @@ export async function registerEvents(client: Client): Promise<void> {
 export async function deployGuildApplicationCommads(guild: Guild): Promise<Collection<Snowflake, ApplicationCommand>> {
   const client = guild.client;
   const commandData = client.commands.map(command => command.data);
-  const createdApplicationCommands = await guild.commands.set(commandData);
+  const createdGuildApplicationCommands = await guild.commands.set(commandData);
   const fullPermissions: Array<GuildApplicationCommandPermissionData> = [];
-  for (const [id, command] of createdApplicationCommands) {
-    const cmd = client.commands.find(cmd => cmd.data.name === command.name);
-    if (!cmd) continue;
+  for (const [id, command] of createdGuildApplicationCommands) {
     fullPermissions.push({
-      id: id,
-      permissions: await buildPermissionData(guild, command.name),
+      id,
+      permissions: await buildPermissionData(guild, command.id),
     });
   }
   await guild.commands.permissions.set({ fullPermissions });
-  await syncGuildApplicationCommandData(guild, createdApplicationCommands);
-  return createdApplicationCommands;
+  return createdGuildApplicationCommands;
 }
 
 export async function buildPermissionData(
   guild: Guild,
-  commandName: string,
+  commandId: Snowflake,
 ): Promise<Array<ApplicationCommandPermissionData>> {
   const data: Array<ApplicationCommandPermissionData> = [
     {
@@ -137,66 +139,35 @@ export async function buildPermissionData(
       permission: true,
     },
   ];
-  const guildDoc = await guild.client.mongoDb.collection<GuildDocument>('guilds').findOne({ id: guild.id });
+  const guildDoc = await guild.client.prisma.guild.findUnique({
+    where: {
+      id: guild.id,
+    },
+    include: {
+      applicationCommands: {
+        include: {
+          permissions: true,
+        },
+      },
+    },
+  });
   if (!guildDoc) {
-    await initGuildDatabase(guild);
+    await initGuildDoc(guild);
     return data;
   }
-  const commandPermissions = guildDoc.applicationCommands?.find(cmd => cmd.name === commandName)?.permissions;
+  const commandPermissions = guildDoc.applicationCommands.find(cmd => cmd.id === commandId)?.permissions;
   if (!commandPermissions) return data;
   for (const { id, type, permission } of commandPermissions) {
-    data.push({ id, type, permission });
+    data.push({ id, type: type === 'ROLE' ? 'ROLE' : 'USER', permission });
   }
   return data;
 }
 
-export async function syncGuildApplicationCommandData(
-  guild: Guild,
-  commands: Collection<string, ApplicationCommand>,
-): Promise<void> {
-  const guildDoc = await guild.client.mongoDb.collection<GuildDocument>('guilds').findOne({ id: guild.id });
-
-  const oldGuildApplicationCommandNames = guildDoc?.applicationCommands.map(cmd => cmd.name);
-  const currentGuildApplicationCommandNames = commands.map(cmd => cmd.name);
-
-  const newGuildApplicationCommands = commands.filter(cmd => !oldGuildApplicationCommandNames?.includes(cmd.name));
-  const newGuildApplicationCommandDataArray = newGuildApplicationCommands.map(cmd => {
-    const newGuildApplicationCommandData: ApplicationCommandDocument = {
-      name: cmd.name,
-      permissions: [],
-    };
-    return newGuildApplicationCommandData;
+export async function initGuildDoc(guild: Guild): Promise<Prisma.Guild> {
+  return await guild.client.prisma.guild.create({
+    data: {
+      id: guild.id,
+      name: guild.name,
+    },
   });
-
-  const newGuildDoc = await guild.client.mongoDb
-    .collection<GuildDocument>('guilds')
-    .findOneAndUpdate(
-      { id: guild.id },
-      { $push: { applicationCommands: { $each: newGuildApplicationCommandDataArray } } },
-      { returnDocument: 'after' },
-    );
-
-  const currentGuildApplicationCommandDataArrary = newGuildDoc.value?.applicationCommands.filter(cmd =>
-    currentGuildApplicationCommandNames.includes(cmd.name),
-  );
-
-  await guild.client.mongoDb
-    .collection<GuildDocument>('guilds')
-    .findOneAndUpdate({ id: guild.id }, { $set: { applicationCommands: currentGuildApplicationCommandDataArrary } });
-}
-
-export async function initGuildDatabase(guild: Guild): Promise<void> {
-  const guildDoc: GuildDocument = {
-    id: guild.id,
-    name: guild.name,
-    applicationCommands: guild.client.commands.map(cmd => {
-      const applicationCommandDoc: ApplicationCommandDocument = {
-        name: cmd.data.name,
-        permissions: [],
-      };
-      return applicationCommandDoc;
-    }),
-  };
-
-  await guild.client.mongoDb.collection<GuildDocument>('guilds').insertOne(guildDoc);
 }

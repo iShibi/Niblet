@@ -1,5 +1,5 @@
-import { initGuildDatabase } from '../../utils/Utility';
 import type { InteractionCommand } from '../../typings';
+import { initGuildDoc } from '../../utils/Utility';
 
 export const interactionCommand: InteractionCommand = {
   data: {
@@ -27,7 +27,7 @@ export const interactionCommand: InteractionCommand = {
     const confirm = interaction.options.get('confirm')?.value;
 
     if (confirm) {
-      await initGuildDatabase(guild);
+      await initGuildDoc(guild);
       return interaction.editReply('Created a new document in the databse for this guild');
     }
 

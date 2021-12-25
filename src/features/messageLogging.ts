@@ -1,11 +1,14 @@
 import { MessageEmbed } from 'discord.js';
 import type { Message } from 'discord.js';
-import type { GuildDocument } from '../typings';
 
 export async function logEditedMessage(oldMessage: Message, newMessage: Message): Promise<unknown> {
   const guild = oldMessage.guild ?? newMessage.guild;
   if (!guild) return;
-  const guildDoc = await guild.client.mongoDb.collection<GuildDocument>('guilds').findOne({ id: guild.id });
+  const guildDoc = await guild.client.prisma.guild.findUnique({
+    where: {
+      id: guild.id,
+    },
+  });
   if (!guildDoc) return;
   const messageLogsChannelId = guildDoc.messageLogsChannelId;
   if (!messageLogsChannelId) return;
@@ -29,7 +32,11 @@ export async function logEditedMessage(oldMessage: Message, newMessage: Message)
 export async function logDeletedMessage(message: Message): Promise<unknown> {
   const guild = message.guild;
   if (!guild) return;
-  const guildDoc = await guild.client.mongoDb.collection<GuildDocument>('guilds').findOne({ id: guild.id });
+  const guildDoc = await guild.client.prisma.guild.findUnique({
+    where: {
+      id: guild.id,
+    },
+  });
   if (!guildDoc) return;
   const messageLogsChannelId = guildDoc.messageLogsChannelId;
   if (!messageLogsChannelId) return;

@@ -1,4 +1,4 @@
-import type { GuildDocument, InteractionCommand } from '../../typings';
+import type { InteractionCommand } from '../../typings';
 
 export const interactionCommand: InteractionCommand = {
   data: {
@@ -30,9 +30,21 @@ export const interactionCommand: InteractionCommand = {
     const memberLogsChannelId = interaction.options.get('member-logs-channel')?.channel?.id;
     const messageLogsChannelId = interaction.options.get('message-logs-channel')?.channel?.id;
 
-    await interaction.client.mongoDb
-      .collection<GuildDocument>('guilds')
-      .findOneAndUpdate({ id: guild.id }, { $set: { memberLogsChannelId, messageLogsChannelId } }, { upsert: true });
+    await interaction.client.prisma.guild.upsert({
+      where: {
+        id: guild.id,
+      },
+      update: {
+        memberLogsChannelId,
+        messageLogsChannelId,
+      },
+      create: {
+        id: guild.id,
+        name: guild.name,
+        memberLogsChannelId,
+        messageLogsChannelId,
+      },
+    });
 
     return interaction.editReply('Added the provided guild data to the database');
   },
