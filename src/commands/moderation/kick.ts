@@ -1,7 +1,7 @@
-import { MessageActionRow, MessageButton } from 'discord.js';
-import { collectButtonInteraction, createUserHistoryEmbed } from '../../utils/Utility';
 import type { InteractionCommand } from '../../typings';
+import { MessageActionRow, MessageButton } from 'discord.js';
 import type { Message, MessageComponentInteraction } from 'discord.js';
+import { collectButtonInteraction, createUserHistoryEmbed } from '../../utils/Utility';
 
 export const interactionCommand: InteractionCommand = {
   data: {

@@ -1,6 +1,6 @@
-import { initGuildDoc } from '../utils/Utility';
 import type { Guild } from 'discord.js';
 import type { Event } from '../typings';
+import { initGuildDoc } from '../utils/Utility';
 
 export const event: Event = {
   name: 'guildCreate',

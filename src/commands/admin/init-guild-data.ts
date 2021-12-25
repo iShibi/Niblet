@@ -1,5 +1,5 @@
-import type { InteractionCommand } from '../../typings';
 import { initGuildDoc } from '../../utils/Utility';
+import type { InteractionCommand } from '../../typings';
 
 export const interactionCommand: InteractionCommand = {
   data: {

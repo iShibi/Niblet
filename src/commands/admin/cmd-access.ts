@@ -1,5 +1,5 @@
-import type { ApplicationCommandPermissionData } from 'discord.js';
 import type { InteractionCommand } from '../../typings';
+import type { ApplicationCommandPermissionData } from 'discord.js';
 
 export const interactionCommand: InteractionCommand = {
   data: {

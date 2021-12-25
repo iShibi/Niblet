@@ -1,5 +1,6 @@
 import fs from 'fs';
 import Prisma from '@prisma/client';
+import type { Event, InteractionCommand } from '../typings';
 import {
   ApplicationCommand,
   ApplicationCommandPermissionData,
@@ -12,7 +13,6 @@ import {
   MessageEmbed,
   Snowflake,
 } from 'discord.js';
-import type { Event, InteractionCommand } from '../typings';
 
 /**
  * Connects the bot to a mongodb atlas database
