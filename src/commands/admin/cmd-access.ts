@@ -122,26 +122,26 @@ export const interactionCommand: InteractionCommand = {
           applicationCommands: {
             upsert: {
               create: {
-                id: command.id,
+                commandName: command.name,
                 permissions: {
                   create: {
-                    id: role.id,
+                    userOrRoleId: role.id,
                     type: 'ROLE',
-                    permission: action === 'unlock' ? true : false,
+                    allowed: action === 'unlock' ? true : false,
                   },
                 },
               },
               update: {
                 permissions: {
                   create: {
-                    id: role.id,
+                    userOrRoleId: role.id,
                     type: 'ROLE',
-                    permission: action === 'unlock' ? true : false,
+                    allowed: action === 'unlock' ? true : false,
                   },
                 },
               },
               where: {
-                id: command.id,
+                commandName: command.name,
               },
             },
           },
@@ -181,26 +181,26 @@ export const interactionCommand: InteractionCommand = {
           applicationCommands: {
             upsert: {
               create: {
-                id: command.id,
+                commandName: command.name,
                 permissions: {
                   create: {
-                    id: user.id,
+                    userOrRoleId: user.id,
                     type: 'User',
-                    permission: action === 'unlock' ? true : false,
+                    allowed: action === 'unlock' ? true : false,
                   },
                 },
               },
               update: {
                 permissions: {
                   create: {
-                    id: user.id,
+                    userOrRoleId: user.id,
                     type: 'User',
-                    permission: action === 'unlock' ? true : false,
+                    allowed: action === 'unlock' ? true : false,
                   },
                 },
               },
               where: {
-                id: command.id,
+                commandName: command.name,
               },
             },
           },

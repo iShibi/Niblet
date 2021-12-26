@@ -121,7 +121,7 @@ export async function deployGuildApplicationCommads(guild: Guild): Promise<Colle
   for (const [id, command] of createdGuildApplicationCommands) {
     fullPermissions.push({
       id,
-      permissions: await buildPermissionData(guild, command.id),
+      permissions: await buildPermissionData(guild, command.name),
     });
   }
   await guild.commands.permissions.set({ fullPermissions });
@@ -130,7 +130,7 @@ export async function deployGuildApplicationCommads(guild: Guild): Promise<Colle
 
 export async function buildPermissionData(
   guild: Guild,
-  commandId: Snowflake,
+  commandName: string,
 ): Promise<Array<ApplicationCommandPermissionData>> {
   const data: Array<ApplicationCommandPermissionData> = [
     {
@@ -155,10 +155,10 @@ export async function buildPermissionData(
     await initGuildDoc(guild);
     return data;
   }
-  const commandPermissions = guildDoc.applicationCommands.find(cmd => cmd.id === commandId)?.permissions;
+  const commandPermissions = guildDoc.applicationCommands.find(cmd => cmd.commandName === commandName)?.permissions;
   if (!commandPermissions) return data;
-  for (const { id, type, permission } of commandPermissions) {
-    data.push({ id, type: type === 'ROLE' ? 'ROLE' : 'USER', permission });
+  for (const { userOrRoleId, type, allowed } of commandPermissions) {
+    data.push({ id: userOrRoleId, type: type === 'ROLE' ? 'ROLE' : 'USER', permission: allowed });
   }
   return data;
 }

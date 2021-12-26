@@ -37,9 +37,9 @@ model User {
 }
 
 model ApplicationCommand {
-  mongoId String @id @default(dbgenerated()) @map("_id") @db.ObjectId
-  id      String @unique
-  guildId String
+  mongoId     String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  commandName String @unique
+  guildId     String
 
   permissions ApplicationCommandPermission[]
 
@@ -47,14 +47,14 @@ model ApplicationCommand {
 }
 
 model ApplicationCommandPermission {
-  mongoId              String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
-  id                   String  @unique
-  permission           Boolean
-  applicationCommandId String
+  mongoId                String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  userOrRoleId           String  @unique
+  allowed                Boolean
+  applicationCommandName String
 
   type ApplicationCommandPermissionType
 
-  applicationCommand ApplicationCommand @relation(fields: [applicationCommandId], references: [id])
+  applicationCommand ApplicationCommand @relation(fields: [applicationCommandName], references: [commandName])
 }
 
 enum ApplicationCommandPermissionType {
