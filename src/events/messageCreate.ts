@@ -1,6 +1,6 @@
-import { deployGuildApplicationCommads } from '../utils/Utility';
 import type { Event } from '../typings';
 import type { Message } from 'discord.js';
+import { deployGuildApplicationCommads } from '../utils/Utility';
 
 export const event: Event = {
   name: 'messageCreate',

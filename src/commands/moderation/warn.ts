@@ -1,7 +1,7 @@
+import type { InteractionCommand } from '../../typings';
 import { MessageActionRow, MessageButton } from 'discord.js';
-import { collectButtonInteraction, createUserHistoryEmbed } from '../../utils/Utility';
-import type { InteractionCommand, UserDocument } from '../../typings';
 import type { Message, MessageComponentInteraction } from 'discord.js';
+import { collectButtonInteraction, createUserHistoryEmbed } from '../../utils/Utility';
 
 export const interactionCommand: InteractionCommand = {
   data: {
@@ -63,9 +63,24 @@ export const interactionCommand: InteractionCommand = {
 
     if (response && response.customId === 'warn') {
       interaction.editReply({ content: `${userToWarn}: ${reason}`, embeds: [], components: [] });
-      return await interaction.client.mongoDb
-        .collection<UserDocument>('users')
-        .findOneAndUpdate({ id: userToWarn.id, guildId: guild.id }, { $inc: { warnings: 1 } }, { upsert: true });
+      await interaction.client.prisma.user.upsert({
+        where: {
+          id_guildId: {
+            id: userToWarn.id,
+            guildId: guild.id,
+          },
+        },
+        update: {
+          warnings: {
+            increment: 1,
+          },
+        },
+        create: {
+          id: userToWarn.id,
+          guildId: guild.id,
+          warnings: 1,
+        },
+      });
     } else {
       interaction.deleteReply();
     }

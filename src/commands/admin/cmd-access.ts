@@ -1,5 +1,5 @@
+import type { InteractionCommand } from '../../typings';
 import type { ApplicationCommandPermissionData } from 'discord.js';
-import type { GuildDocument, InteractionCommand } from '../../typings';
 
 export const interactionCommand: InteractionCommand = {
   data: {
@@ -103,26 +103,50 @@ export const interactionCommand: InteractionCommand = {
       const action = interaction.options.get('action', true).value as 'lock' | 'unlock';
       if (!action) return interaction.editReply('Provide a valid action to perform on the role');
 
-      const permissionData: Array<ApplicationCommandPermissionData> = [
-        {
-          id: role.id,
-          type: 'ROLE',
-          permission: action === 'unlock' ? true : false,
-        },
-      ];
+      const permissionData: ApplicationCommandPermissionData = {
+        id: role.id,
+        type: 'ROLE',
+        permission: action === 'unlock' ? true : false,
+      };
 
       await interaction.guild.commands.permissions.add({
         command: command,
-        permissions: permissionData,
+        permissions: [permissionData],
       });
 
-      await interaction.client.mongoDb
-        .collection<GuildDocument>('guilds')
-        .findOneAndUpdate(
-          { id: guild.id },
-          { $push: { 'applicationCommands.$[index].permissions': { $each: permissionData } } },
-          { arrayFilters: [{ 'index.name': command.name }], upsert: true },
-        );
+      await interaction.client.prisma.guild.update({
+        where: {
+          id: guild.id,
+        },
+        data: {
+          applicationCommands: {
+            upsert: {
+              create: {
+                commandName: command.name,
+                permissions: {
+                  create: {
+                    userOrRoleId: role.id,
+                    type: 'ROLE',
+                    allowed: action === 'unlock' ? true : false,
+                  },
+                },
+              },
+              update: {
+                permissions: {
+                  create: {
+                    userOrRoleId: role.id,
+                    type: 'ROLE',
+                    allowed: action === 'unlock' ? true : false,
+                  },
+                },
+              },
+              where: {
+                commandName: command.name,
+              },
+            },
+          },
+        },
+      });
 
       return interaction.editReply(`${action}ed the command \`${nameOfCommandToConfigure}\` for \`${role.name}\` role`);
     } else if (subCommandName === 'for-user') {
@@ -138,26 +162,50 @@ export const interactionCommand: InteractionCommand = {
       const action = interaction.options.get('action', true).value as 'lock' | 'unlock';
       if (!action) return interaction.editReply('Provide a valid action to perform on the user');
 
-      const permissionData: Array<ApplicationCommandPermissionData> = [
-        {
-          id: user.id,
-          type: 'USER',
-          permission: action === 'unlock' ? true : false,
-        },
-      ];
+      const permissionData: ApplicationCommandPermissionData = {
+        id: user.id,
+        type: 'USER',
+        permission: action === 'unlock' ? true : false,
+      };
 
       await interaction.guild.commands.permissions.add({
         command: command,
-        permissions: permissionData,
+        permissions: [permissionData],
       });
 
-      await interaction.client.mongoDb
-        .collection<GuildDocument>('guilds')
-        .findOneAndUpdate(
-          { id: guild.id },
-          { $push: { 'applicationCommands.$[index].permissions': { $each: permissionData } } },
-          { arrayFilters: [{ 'index.name': command.name }], upsert: true },
-        );
+      await interaction.client.prisma.guild.update({
+        where: {
+          id: guild.id,
+        },
+        data: {
+          applicationCommands: {
+            upsert: {
+              create: {
+                commandName: command.name,
+                permissions: {
+                  create: {
+                    userOrRoleId: user.id,
+                    type: 'User',
+                    allowed: action === 'unlock' ? true : false,
+                  },
+                },
+              },
+              update: {
+                permissions: {
+                  create: {
+                    userOrRoleId: user.id,
+                    type: 'User',
+                    allowed: action === 'unlock' ? true : false,
+                  },
+                },
+              },
+              where: {
+                commandName: command.name,
+              },
+            },
+          },
+        },
+      });
 
       return interaction.editReply(`${action}ed the command \`${nameOfCommandToConfigure}\` for \`${user.username}\``);
     }

@@ -1,0 +1,63 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["mongoDb"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("NIBLET_ATLAS_URI")
+}
+
+model Guild {
+  mongoId              String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id                   String  @unique
+  name                 String
+  memberLogsChannelId  String?
+  messageLogsChannelId String?
+
+  users               User[]
+  applicationCommands ApplicationCommand[]
+}
+
+model User {
+  mongoId      String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id           String   @unique
+  guildId      String
+  roles        String[]
+  warnings     Int?
+  restrictions Int?
+  mutes        Int?
+  kicks        Int?     @default(0)
+  softbans     Int?     @default(0)
+  bans         Int?     @default(0)
+
+  guild Guild @relation(fields: [guildId], references: [id])
+
+  @@unique([id, guildId])
+}
+
+model ApplicationCommand {
+  mongoId     String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  commandName String @unique
+  guildId     String
+
+  permissions ApplicationCommandPermission[]
+
+  guild Guild @relation(fields: [guildId], references: [id])
+}
+
+model ApplicationCommandPermission {
+  mongoId                String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  userOrRoleId           String  @unique
+  allowed                Boolean
+  applicationCommandName String
+
+  type ApplicationCommandPermissionType
+
+  applicationCommand ApplicationCommand @relation(fields: [applicationCommandName], references: [commandName])
+}
+
+enum ApplicationCommandPermissionType {
+  User
+  ROLE
+}

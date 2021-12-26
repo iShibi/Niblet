@@ -1,11 +1,14 @@
 import { MessageEmbed } from 'discord.js';
 import type { GuildMember } from 'discord.js';
-import type { GuildDocument } from '../typings';
 
 export async function logMember(member: GuildMember, logType: MemberLogType): Promise<unknown> {
   const guild = member.guild;
   if (!guild) return;
-  const guildDoc = await guild.client.mongoDb.collection<GuildDocument>('guilds').findOne({ id: guild.id });
+  const guildDoc = await guild.client.prisma.guild.findUnique({
+    where: {
+      id: guild.id,
+    },
+  });
   if (!guildDoc) return;
   const memberLogsChannelId = guildDoc.memberLogsChannelId;
   if (!memberLogsChannelId) return;

@@ -1,4 +1,4 @@
-import { InteractionCommand } from '../../typings';
+import type { InteractionCommand } from '../../typings';
 import { createUserHistoryEmbed } from '../../utils/Utility';
 
 export const interactionCommand: InteractionCommand = {

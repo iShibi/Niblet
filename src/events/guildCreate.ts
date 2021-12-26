@@ -1,15 +1,19 @@
-import { initGuildDatabase } from '../utils/Utility';
 import type { Guild } from 'discord.js';
-import type { Event, GuildDocument } from '../typings';
+import type { Event } from '../typings';
+import { initGuildDoc } from '../utils/Utility';
 
 export const event: Event = {
   name: 'guildCreate',
   once: false,
   async execute(guild: Guild) {
-    const guildDocExist = await guild.client.mongoDb.collection<GuildDocument>('guilds').findOne({ id: guild.id });
+    const guildDocExist = await guild.client.prisma.guild.findUnique({
+      where: {
+        id: guild.id,
+      },
+    });
 
     if (!guildDocExist) {
-      await initGuildDatabase(guild);
+      await initGuildDoc(guild);
     }
   },
 };
